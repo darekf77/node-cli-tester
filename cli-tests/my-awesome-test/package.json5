@@ -1,0 +1,10 @@
+{
+// generated from basename
+"name": "my-awesome-test",
+"tnp": {
+  "type": "cli-test"
+},
+"version": "0.0.0",
+// git ignroe all files except this
+"files-list": []
+}

@@ -1,14 +1,16 @@
+//#region imports
 import * as _ from 'lodash';
 import * as path from 'path';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
+import { CliTest } from './cli-test.backend';
+//#endregion
 
 
 export class NodeCliTester {
   //#region singleton
   private static _instances = {};
   public static classFn = NodeCliTester;
-  protected NAME_FOR_CLI_TESTS_FOLDER = 'cli-tests';
 
   protected constructor(
     protected readonly cwd = process.cwd()
@@ -28,51 +30,43 @@ export class NodeCliTester {
   }
   //#endregion
 
+  //#region create test
   async createTest(testName: string) {
     Helpers.log(`Create test from node-cli-tester`);
-    const folderName = _.kebabCase(testName);
-    const testFolderPath = path.join(this.cwd, this.NAME_FOR_CLI_TESTS_FOLDER, folderName);
-    Helpers.mkdirp(testFolderPath);
-    const testPackageJsonPath = path.join(
-      this.cwd,
-      this.NAME_FOR_CLI_TESTS_FOLDER,
-      folderName,
-      config.file.package_json,
-    );
-    Helpers.writeFile(testPackageJsonPath, `{
-      // generated from basename
-      "name": "${folderName}",
-      "tnp": {
-        "type": "cli-test"
-      },
-      "version": "0.0.0",
-      // git ignroe all files except this
-      "files-list": [
-        "nes-ui/node_modules/es-common/src/es-common-module.ts",
-      ]
-    }`);
+    const c = CliTest.from(testName, this.cwd);
+    c.regenerate();
   }
+  //#endregion
 
+  //#region create test and add file
   async createTestAndAddFile(testName: string, filePath: string) {
     await this.createTest(testName);
     await this.addFileToTest(testName, filePath)
   }
+  //#endregion
 
-
+  //#region add file to test
   addFileToTest(testName: string, filePath: string) {
     // const folderName
   }
+  //#endregion
 
+  //#region get all tests names
   getAllTestsNames() {
 
   }
+  //#endregion
 
+  //#region start test
   startTest(testName: string) {
 
   }
+  //#endregion
 
+  //#region create base structure
   createBaseStructure(pathToBaseStructure: string) {
 
   }
+  //#endregion
 
 }
