@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as path from 'path';
-import * as json5writer from 'json5-writer';
+// import * as json5writer from 'json5-writer';
 import * as json5 from 'json5';
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
@@ -22,23 +22,27 @@ export class CliTest {
     return CliTest.instances[cwd][testName] as CliTest;
   }
 
-  get folderName() {
+  get metaMdConfigs() {
+    return Helpers.metaMd.allFrom(path.join(this.cwd, this.testName));
+  }
+
+  private get folderName() {
     return _.kebabCase(this.testName);
   }
-  get packageJson5Path() {
+  private get packageJson5Path() {
     return path.join(this.testDirnamePath, config.file.package_json5);
   }
 
-  get packageJsonPath() {
+  private get packageJsonPath() {
     return path.join(this.testDirnamePath, config.file.package_json);
   }
-  get gitignorePath() {
+  private get gitignorePath() {
     return path.join(this.testDirnamePath, config.file._gitignore);
   }
-  get specTsPath() {
+  private get specTsPath() {
     return path.join(this.testDirnamePath, `${this.folderName}.spec.ts`);
   }
-  get testDirnamePath() {
+  private get testDirnamePath() {
     return path.join(
       this.cwd,
       this.NAME_FOR_CLI_TESTS_FOLDER,
@@ -50,6 +54,9 @@ export class CliTest {
     public cwd: string = process.cwd()
   ) {
 
+  }
+  public clear() {
+    Helpers.foldersFrom([this.cwd, this.folderName]).forEach(c => Helpers.removeFolderIfExists(c));
   }
 
   public regenerate() {
@@ -100,8 +107,11 @@ describe('${_.startCase(this.folderName)}', () => {
   }
 
   private regenerateGitIgnore() {
-    const writer = json5writer.load(Helpers.readFile(this.packageJson5Path));
-    const packageJson5 = Helpers.readJson(this.packageJson5Path);
+    // const writer = json5writer.load(Helpers.readFile(this.packageJson5Path));
+    // const packageJson5 = Helpers.readJson(this.packageJson5Path);
+    const workspacesToRecreate = Helpers.arrays
+      .uniqArray(this.metaMdConfigs.map(c => `./${_.first(c.originalFilePath.filepath.split('/'))}`))
+      .join('\n')
 
     Helpers.writeFile(this.gitignorePath,
       //#region content of .gitignore
@@ -111,7 +121,7 @@ describe('${_.startCase(this.folderName)}', () => {
 !/${path.basename(this.specTsPath)}
 !/package.json
 !/package.json5
-!/nes-ui/node_modules/es-common/src/es-common-module.ts
+${workspacesToRecreate}
 
       `
       //#endregion
