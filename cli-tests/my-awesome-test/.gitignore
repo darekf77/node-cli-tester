@@ -1,0 +1,9 @@
+
+/**/*.*
+!/.gitignore
+!/my-awesome-test.spec.ts
+!/package.json
+!/package.json5
+!/*.md
+
+      
