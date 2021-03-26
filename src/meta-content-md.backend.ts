@@ -3,7 +3,8 @@ import * as glob from 'glob';
 import * as path from 'path';
 import * as _ from 'lodash';
 import { config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
+import { Helpers, Project } from 'tnp-helpers';
+import { TestTemplates } from './spec-templates.backend';
 //#endregion
 
 //#region models
@@ -12,31 +13,11 @@ export interface MetaMdJSONProject {
   isLinkFrom?: string; tests
 }
 
+export type MetaMdJSONProjects = { [projPath: string]: MetaMdJSONProject; };
+
 export interface MetaMdJSON {
   orgFileBasename: string;
-  projects: { [projPath: string]: MetaMdJSONProject; }
-}
-//#endregion
-
-//#region create test part
-function testPart(pathToFile: string, projPath: string) {
-  const timeHash = (+new Date).toString(36);
-  return `
-import * as _ from 'path';
-import { describe, before, beforeEach, it } from 'mocha';
-import { expect } from 'chai';
-import { recreateEnvironment  } from 'node-cli-tester';
-
-describe('es-common-module.ts test',()=> {
-
- it('Should pass the test with hash "${timeHash}", async  () => {
-  const relativePathToFile = './${timeHash}/${projPath}/${pathToFile}';
-   recreateEnvironment(path.join(__dirname,relativePathToFile));
-   expect(true).to.not.be(false);
- })
-
-})
-  `.trim();
+  projects: MetaMdJSONProjects;
 }
 //#endregion
 
@@ -57,6 +38,8 @@ export class MetaMd {
   static preserveFile(
     originalAnyTypeFile: string,
     destinationFolder: string,
+    editorCwd = process.cwd(),
+    foundProjectFn: (projects: Project[]) => Project[] = void 0
   ) {
     const properDestName = `${path.basename(originalAnyTypeFile)}.meta-content.md`;
     if (!Helpers.isFolder(destinationFolder)) {
@@ -64,7 +47,19 @@ export class MetaMd {
        is not a folder`, false, true)
     }
     const orgFileBasename = path.basename(originalAnyTypeFile);
-    const projects = {};
+    let foundedProjectsInPath = Project.allProjectFrom(originalAnyTypeFile, editorCwd);
+    if (foundProjectFn) {
+      foundedProjectsInPath = foundProjectFn(foundedProjectsInPath);
+    }
+    console.log(foundedProjectsInPath.map(p => p.location))
+    const projects = foundedProjectsInPath
+      .reduce((a, b) => {
+        return _.merge(a, {
+          [path.join(path.basename(editorCwd), b.location.replace(editorCwd, ''))]: {
+            githash: b.git.lastCommitHash()
+          }
+        } as MetaMdJSONProjects)
+      }, {} as MetaMdJSONProjects)
     const c = MetaMd.create({
       orgFileBasename,
       projects,
@@ -148,7 +143,7 @@ function create(json5string: string, fileContent: String, testContent?: string) 
     const projPath = _.maxBy(_.keys(metadataJSON.projects).map(projRelPath => {
       return { path: projRelPath, length: projRelPath.length };
     }), c => c.length)?.path || '';
-    testContent = testPart(filePath, projPath)
+    testContent = TestTemplates.testPart(filePath, projPath)
   }
 
   return `

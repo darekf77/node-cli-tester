@@ -4,10 +4,12 @@ import * as path from 'path';
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { MetaMd } from './meta-content-md.backend';
+import { TestTemplates } from './spec-templates.backend';
+import type { NodeCliTester } from './node-cli-tester.backend';
 //#endregion
 
 export class CliTest {
-  protected readonly NAME_FOR_CLI_TESTS_FOLDER = 'cli-tests';
+  protected readonly NAME_FOR_CLI_TESTS_FOLDER = 'src/tests';
   readonly testDirnamePath: string;
 
   //#region singleton  / static inst
@@ -35,8 +37,8 @@ export class CliTest {
       get all() {
         return MetaMd.allInstancesFrom(that.testDirnamePath);
       },
-      add(originalFilePath: string) {
-        MetaMd.preserveFile(originalFilePath, that.testDirnamePath);
+      add(originalFilePath: string, baseCwd: string, NodeCliTestrClass: typeof NodeCliTester) {
+        MetaMd.preserveFile(originalFilePath, that.testDirnamePath, baseCwd, NodeCliTestrClass.foundProjectsFn);
       }
     }
   }
@@ -90,7 +92,7 @@ export class CliTest {
       Helpers.mkdirp(this.testDirnamePath);
     }
     this.regeneratePackageJson5();
-    this.regenerateSpecTs();
+    TestTemplates.regenerateSpecTs(this.specTsPath, this.testName);
     this.regenerateGitIgnore();
   }
   //#endregion
@@ -98,33 +100,6 @@ export class CliTest {
   //#endregion
 
   //#region private methods
-
-  //#region regenerate spec ts
-  private regenerateSpecTs() {
-    if (!Helpers.exists(this.specTsPath)) {
-      Helpers.writeFile(this.specTsPath,
-        //#region content of *.spec.ts
-        `
-import * as _ from 'path';
-import { describe, before, beforeEach, it } from 'mocha';
-import { expect } from 'chai';
-import { recreateEnvironment  } from 'node-cli-tester';
-
-describe('${_.startCase(this.testName)}', () => {
-
-  // PUT ALL YOUR TESTS HERE
-
-  // @ts-ignore
-  it('should works example unit test', () => {
-    expect(1).to.be.gt(0)
-  });
-});
-`
-        //#endregion
-      );
-    }
-  }
-  //#endregion
 
   //#region regenerate package json 5
   private regeneratePackageJson5() {

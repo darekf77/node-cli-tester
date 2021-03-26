@@ -1,16 +1,19 @@
 //#region imports
 import * as _ from 'lodash';
 import * as path from 'path';
-import { Helpers } from 'tnp-helpers';
+import { Helpers, Project } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { CliTest } from './cli-test.backend';
+import { CLASS } from 'typescript-class-helpers';
 //#endregion
 
 
 export class NodeCliTester {
   //#region singleton
   private static _instances = {};
+  public static DEFAULT_COMMAND = `my-command-to-run`;
   public static classFn = NodeCliTester;
+  public static foundProjectsFn: (projects: Project[]) => Project[] = void 0;
 
   protected constructor(
     protected readonly cwd = process.cwd()
@@ -39,15 +42,16 @@ export class NodeCliTester {
 
   //#region create test and add file
   async createTestAndAddFile(testName: string, absoluteFilePath: string) {
+    const editorCwd: string = process.cwd()
     await this.createTest(testName);
-    await this.addFileToTest(testName, absoluteFilePath);
+    await this.addFileToTest(testName, absoluteFilePath, editorCwd);
   }
   //#endregion
 
   //#region add file to test
-  async addFileToTest(testName: string, filePath: string) {
+  async addFileToTest(testName: string, filePath: string, editorCwd: string) {
     const c = CliTest.from(testName, this.cwd);
-    c.metaMd.add(filePath);
+    c.metaMd.add(filePath, editorCwd, CLASS.getFromObject(this));
   }
   //#endregion
 

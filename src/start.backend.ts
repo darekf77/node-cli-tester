@@ -9,7 +9,8 @@ export async function run<T extends NodeCliTester = NodeCliTester>(
   const command: Lowercase<keyof NodeCliTester> = argsv.shift().toLowerCase() as any;
   for (const key in instance) {
     if (key.toLowerCase() === command && _.isFunction(instance[key])) {
-      await Helpers.runSyncOrAsync([key, instance], ...argsv);
+      const argsToPass = argsv.filter(a => !a.startsWith('--'));
+      await Helpers.runSyncOrAsync([key, instance], ...argsToPass);
     }
   }
   process.exit(0);
