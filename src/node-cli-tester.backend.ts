@@ -37,7 +37,7 @@ export class NodeCliTester {
   //#region create test
   async createTest(testName: string) {
     Helpers.log(`Create test from node-cli-tester`);
-    this.regenerateTest(testName);
+    await this.regenerateTest(testName);
   }
   //#endregion
 
@@ -51,7 +51,7 @@ export class NodeCliTester {
   //#region add file to test
   async addFileToTest(testName: string, filePath: string, editorCwd: string = process.cwd()) {
     const c = CliTest.from(this.cwd, testName);
-    c.metaMd.add(filePath, editorCwd, CLASS.getFromObject(this));
+    await c.metaMd.add(filePath, editorCwd, CLASS.getFromObject(this));
   }
   //#endregion
 
@@ -68,9 +68,9 @@ export class NodeCliTester {
   //#endregion
 
   //#region regenerate test
-  regenerateTest(testName: string) {
+  async regenerateTest(testName: string) {
     const c = CliTest.from(this.cwd,testName);
-    c.regenerate();
+    await c.regenerate();
   }
   //#endregion
 

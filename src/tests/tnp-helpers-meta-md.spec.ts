@@ -14,13 +14,13 @@ const readOnlyFileForTemplate = path.join(process.cwd(), 'tmp-meta-md-file-examp
 
 describe('tnp-helpers meta-content.md', () => {
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Helpers.log(`readOnlyFileForTemplate: ${readOnlyFileForTemplate}`)
     Helpers.removeFileIfExists(readOnlyFileForTemplate);
-    Helpers.writeFile(readOnlyFileForTemplate, metaContentFile());
+    Helpers.writeFile(readOnlyFileForTemplate, await metaContentFile());
   })
 
-  it('Should properly extact json metadata', () => {
+  it('Should properly extract json metadata', () => {
     const ins = MetaMd.instanceFrom(readOnlyFileForTemplate);
     const json5json = Helpers.parse(json5Part(), true);
     expect(_.isEqual(ins.readonlyMetaJson, json5json)).to.be.true;
@@ -33,8 +33,8 @@ describe('tnp-helpers meta-content.md', () => {
 
 })
 
-function metaContentFile() {
-  return MetaMd.create(json5Part() as any, tsPart());
+async function metaContentFile() {
+  return await MetaMd.create(json5Part() as any, tsPart());
 }
 
 function json5Part() {
@@ -49,7 +49,8 @@ function json5Part() {
     },
   },
   // path to file
-  "orgFileBasename": "es-common-module.ts"
+  "orgFileBasename": "es-common-module.ts",
+  "timehash": '24234234',
 }
   `.trim();
 }

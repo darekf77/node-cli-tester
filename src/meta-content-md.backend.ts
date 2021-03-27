@@ -34,13 +34,13 @@ export class MetaMd {
   static readonly TEST_PART = '@testPart';
 
   //#region static fields / create
-  static create(json: MetaMdJSON, fileContent: string, testContent?: string) {
-    return create((_.isObject(json) ? Helpers.stringify(json) : json) as any, fileContent, testContent);
+  static async create(json: MetaMdJSON, fileContent: string, testContent?: string) {
+    return await create((_.isObject(json) ? Helpers.stringify(json) : json) as any, fileContent, testContent);
   }
   //#endregion
 
   //#region static fields / preserve file
-  static preserveFile(
+  static async preserveFile(
     originalAnyTypeFile: string,
     destinationFolder: string,
     editorCwd = process.cwd(),
@@ -67,7 +67,7 @@ export class MetaMd {
         } as MetaMdJSONProjects)
       }, {} as MetaMdJSONProjects);
     const timeHash = (+new Date).toString(36);
-    const c = MetaMd.create({
+    const c = await MetaMd.create({
       orgFileBasename,
       projects,
       timeHash,
@@ -137,7 +137,7 @@ export class MetaMd {
 }
 
 //#region create
-function create(json5string: string, fileContent: string, testContent?: string) {
+async function create(json5string: string, fileContent: string, testContent?: string) {
   const metadataJSON = Helpers.parse<MetaMdJSON>(json5string, true);
   // Helpers.log(`metadataJSON.orgFileBasename: ${metadataJSON.orgFileBasename}`)
   const ext = path.extname(metadataJSON.orgFileBasename).replace(/^\./, '');
@@ -147,7 +147,10 @@ function create(json5string: string, fileContent: string, testContent?: string) 
     const projPath = _.maxBy(_.keys(metadataJSON.projects).map(projRelPath => {
       return { path: projRelPath, length: projRelPath.length };
     }), c => c.length)?.path || '';
-    const TestTemplatesClass = CLASS.getBy('TestTemplates') as typeof TestTemplates;
+    let TestTemplatesClass = CLASS.getBy('TestTemplates') as typeof TestTemplates;
+    if (!TestTemplatesClass) {
+      TestTemplatesClass = await(await import('./spec-templates.backend')).TestTemplates;
+    }
     testContent = TestTemplatesClass.testPart(filePath, projPath, metadataJSON.timeHash);
   }
 

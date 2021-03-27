@@ -36,7 +36,7 @@ export class CliTest {
     }
     if (!CliTest.instances[cwd][testName]) {
 
-      CliTest.instances[cwd][testName] = new CliTest(testName, cwd);
+      CliTest.instances[cwd][testName] = new CliTest(cwd, testName);
     }
     return CliTest.instances[cwd][testName] as CliTest;
   }
@@ -51,8 +51,8 @@ export class CliTest {
       get all() {
         return MetaMd.allInstancesFrom(that.testDirnamePath);
       },
-      add(originalFilePath: string, baseCwd: string, NodeCliTestrClass: typeof NodeCliTester) {
-        MetaMd.preserveFile(originalFilePath, that.testDirnamePath, baseCwd, NodeCliTestrClass.foundProjectsFn);
+      async add(originalFilePath: string, baseCwd: string, NodeCliTestrClass: typeof NodeCliTester) {
+        await MetaMd.preserveFile(originalFilePath, that.testDirnamePath, baseCwd, NodeCliTestrClass.foundProjectsFn);
       }
     }
   }
@@ -109,12 +109,15 @@ export class CliTest {
   //#endregion
 
   //#region regenerate
-  public regenerate() {
+  public async regenerate() {
     if (!Helpers.exists(this.testDirnamePath)) {
       Helpers.mkdirp(this.testDirnamePath);
     }
     this.regeneratePackageJson5();
-    const TestTemplatesClass = CLASS.getBy('TestTemplates') as typeof TestTemplates;
+    let TestTemplatesClass = CLASS.getBy('TestTemplates') as typeof TestTemplates;
+    if (!TestTemplatesClass) {
+      TestTemplatesClass = await (await import('./spec-templates.backend')).TestTemplates;
+    }
     TestTemplatesClass.regenerateSpecTs(this.specTsPath, this.testName);
     this.regenerateGitIgnore();
   }
