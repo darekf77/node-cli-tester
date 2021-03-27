@@ -1,14 +1,17 @@
+//#region imports
 import * as _ from 'lodash';
+import { CLASS } from 'typescript-class-helpers';
 import { Helpers } from 'tnp-helpers';
-import { NodeCliTester } from './node-cli-tester.backend';
+//#endregion
 
+//#region base imports contant
 const baseImports = `
 import * as _ from 'lodash';
 import * as path from 'path';
 import { describe, before, beforeEach, it } from 'mocha';
 import { expect } from 'chai';
 import { CLASS } from 'typescript-class-helpers';
-import { Helpers, Project } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers';
 import { NodeCliTester  } from 'node-cli-tester';
 `.trim();
 
@@ -16,14 +19,17 @@ const testMeta = `
 // const testName = this.test.title;
 // const testFullName = this.test.fullTitle();
 `.trim();
-
-export namespace TestTemplates {
+//#endregion
+@CLASS.NAME('TestTemplates')
+export class TestTemplates {
+  public static DEFAULT_COMMAND = `my-command-to-run`;
+  public static PROJECT_ENTITY_LOCATION = `tnp-helpers`;
 
   //#region create test part
-  export function testPart(pathToFile: string, projPath: string) {
-    const timeHash = (+new Date).toString(36);
+  public static testPart(pathToFile: string, projPath: string, timeHash: string) {
     return `
 ${baseImports}
+import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
 
 describe('${projPath}',()=> {
 
@@ -35,7 +41,7 @@ ${testMeta}
    Helpers.remove(cwd);
    const Project = CLASS.getByName('Project') as typeof Project;
    const proj = Project.From(cwd);
-   proj.run(\`${NodeCliTester.DEFAULT_COMMAND} param1 param2 \`,{ biggerBuffer: false }).sync()
+   proj.run(\`${this.DEFAULT_COMMAND} param1 param2 \`,{ biggerBuffer: false }).sync()
    expect(true).to.not.be.true;
  })
 
@@ -45,12 +51,13 @@ ${testMeta}
   //#endregion
 
   //#region regenerate spec ts
-  export function regenerateSpecTs(specTsPath: string, testName: string) {
+  public static regenerateSpecTs(specTsPath: string, testName: string) {
     if (!Helpers.exists(specTsPath)) {
       Helpers.writeFile(specTsPath,
         //#region content of *.spec.ts
         `
 ${baseImports}
+import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
 
 describe('${_.startCase(testName)}', () => {
 

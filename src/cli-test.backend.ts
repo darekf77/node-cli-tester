@@ -4,24 +4,38 @@ import * as path from 'path';
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { MetaMd } from './meta-content-md.backend';
-import { TestTemplates } from './spec-templates.backend';
+import type { TestTemplates } from './spec-templates.backend';
 import type { NodeCliTester } from './node-cli-tester.backend';
+import { CLASS } from 'typescript-class-helpers';
+import * as json5 from 'json5';
 //#endregion
 
 export class CliTest {
-  protected readonly NAME_FOR_CLI_TESTS_FOLDER = 'src/tests';
+  static readonly NAME_FOR_CLI_TESTS_FOLDER = 'src/tests';
   readonly testDirnamePath: string;
 
   //#region singleton  / static inst
   private static instances = {};
+  static allFrom(cwd: string): CliTest[] {
+    const folderWithTests = path.join(cwd,
+      this.NAME_FOR_CLI_TESTS_FOLDER);
+    const folders = Helpers.foldersFrom(folderWithTests);
+    const tests = folders.map(f => CliTest.from(f)).filter(f => !!f);
+    return tests;
+  }
   static from(
-    testName: string,
     cwd: string,
+    testName?: string,
   ) {
+    if (!testName) {
+      testName = path.basename(cwd);
+      cwd = path.dirname(cwd);
+    }
     if (!CliTest.instances[cwd]) {
       CliTest.instances[cwd] = {};
     }
     if (!CliTest.instances[cwd][testName]) {
+
       CliTest.instances[cwd][testName] = new CliTest(testName, cwd);
     }
     return CliTest.instances[cwd][testName] as CliTest;
@@ -67,14 +81,22 @@ export class CliTest {
 
   //#region constructor / init
   constructor(
+    public cwd: string,
     public testName: string,
-    cwd: string = process.cwd()
+
   ) {
     this.testDirnamePath = path.join(
       cwd,
-      this.NAME_FOR_CLI_TESTS_FOLDER,
+      CliTest.NAME_FOR_CLI_TESTS_FOLDER,
       _.kebabCase(this.testName),
-    )
+    );
+    if (Helpers.exists(this.packageJson5Path)) {
+      const testNameFromPJ5 = Helpers.readJson(this.packageJson5Path, {}, true).description;
+      if (testNameFromPJ5) {
+        testName = testNameFromPJ5;
+        this.testName = testName;
+      }
+    }
   }
   //#endregion
 
@@ -92,7 +114,8 @@ export class CliTest {
       Helpers.mkdirp(this.testDirnamePath);
     }
     this.regeneratePackageJson5();
-    TestTemplates.regenerateSpecTs(this.specTsPath, this.testName);
+    const TestTemplatesClass = CLASS.getBy('TestTemplates') as typeof TestTemplates;
+    TestTemplatesClass.regenerateSpecTs(this.specTsPath, this.testName);
     this.regenerateGitIgnore();
   }
   //#endregion

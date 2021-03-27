@@ -1,9 +1,0 @@
-{
-  // generated from basename
-  "name": "my-awesome-test",
-  "description": "my awesome test",
-  "tnp": {
-    "type": "cli-test"
-  },
-  "version": "0.0.0",
-  }

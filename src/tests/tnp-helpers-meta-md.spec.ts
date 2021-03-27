@@ -5,6 +5,8 @@ import { expect } from 'chai';
 import { Helpers } from 'tnp-helpers';
 import { MetaMd } from '../meta-content-md.backend';
 // import type { MetaMdJSON } from '../meta-content-md.backend';
+import { TestTemplates } from '../spec-templates.backend';
+TestTemplates.testPart; // TODO QUICK FIX for CLASS.getBy in test
 
 // const instance = BrowserDB.instance;
 const readOnlyFileForTemplate = path.join(process.cwd(), 'tmp-meta-md-file-example.ts.meta-content.md');

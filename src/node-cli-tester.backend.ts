@@ -9,9 +9,10 @@ import { CLASS } from 'typescript-class-helpers';
 
 
 export class NodeCliTester {
+
   //#region singleton
   private static _instances = {};
-  public static DEFAULT_COMMAND = `my-command-to-run`;
+
   public static classFn = NodeCliTester;
   public static foundProjectsFn: (projects: Project[]) => Project[] = void 0;
 
@@ -41,16 +42,15 @@ export class NodeCliTester {
   //#endregion
 
   //#region create test and add file
-  async createTestAndAddFile(testName: string, absoluteFilePath: string) {
-    const editorCwd: string = process.cwd()
+  async createTestAndAddFile(testName: string, absoluteFilePath: string, editorCwd: string = process.cwd()) {
     await this.createTest(testName);
     await this.addFileToTest(testName, absoluteFilePath, editorCwd);
   }
   //#endregion
 
   //#region add file to test
-  async addFileToTest(testName: string, filePath: string, editorCwd: string) {
-    const c = CliTest.from(testName, this.cwd);
+  async addFileToTest(testName: string, filePath: string, editorCwd: string = process.cwd()) {
+    const c = CliTest.from(this.cwd, testName);
     c.metaMd.add(filePath, editorCwd, CLASS.getFromObject(this));
   }
   //#endregion
@@ -69,7 +69,7 @@ export class NodeCliTester {
 
   //#region regenerate test
   regenerateTest(testName: string) {
-    const c = CliTest.from(testName, this.cwd);
+    const c = CliTest.from(this.cwd,testName);
     c.regenerate();
   }
   //#endregion

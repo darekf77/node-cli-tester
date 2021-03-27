@@ -4,7 +4,8 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import { config } from 'tnp-config';
 import { Helpers, Project } from 'tnp-helpers';
-import { TestTemplates } from './spec-templates.backend';
+import type { TestTemplates } from './spec-templates.backend';
+import { CLASS } from 'typescript-class-helpers';
 //#endregion
 
 //#region models
@@ -17,10 +18,14 @@ export type MetaMdJSONProjects = { [projPath: string]: MetaMdJSONProject; };
 
 export interface MetaMdJSON {
   orgFileBasename: string;
+  timeHash: string;
   projects: MetaMdJSONProjects;
 }
 //#endregion
 
+/**
+ * Special forma of .md for keeping metadata, testfile, and test template for file
+ */
 export class MetaMd {
 
   //#region static fields
@@ -29,7 +34,7 @@ export class MetaMd {
   static readonly TEST_PART = '@testPart';
 
   //#region static fields / create
-  static create(json: MetaMdJSON, fileContent: String, testContent?: string) {
+  static create(json: MetaMdJSON, fileContent: string, testContent?: string) {
     return create((_.isObject(json) ? Helpers.stringify(json) : json) as any, fileContent, testContent);
   }
   //#endregion
@@ -52,17 +57,20 @@ export class MetaMd {
       foundedProjectsInPath = foundProjectFn(foundedProjectsInPath);
     }
     console.log(foundedProjectsInPath.map(p => p.location))
+    const mostBaseLocationFound = _.minBy(foundedProjectsInPath, p => p.location.length).location;
     const projects = foundedProjectsInPath
       .reduce((a, b) => {
         return _.merge(a, {
-          [path.join(path.basename(editorCwd), b.location.replace(editorCwd, ''))]: {
+          [path.join(path.basename(mostBaseLocationFound), b.location.replace(mostBaseLocationFound, ''))]: {
             githash: b.git.lastCommitHash()
           }
         } as MetaMdJSONProjects)
-      }, {} as MetaMdJSONProjects)
+      }, {} as MetaMdJSONProjects);
+    const timeHash = (+new Date).toString(36);
     const c = MetaMd.create({
       orgFileBasename,
       projects,
+      timeHash,
     }, Helpers.readFile(originalAnyTypeFile));
 
     Helpers.writeFile(path.join(destinationFolder, properDestName), c);
@@ -110,9 +118,11 @@ export class MetaMd {
   }
   //#endregion
 
+  //#region constructor
   constructor(
     private readonly filePath: string,
   ) { }
+  //#endregion
 
   //#region recreate files/content/env before any tests
   /**
@@ -127,13 +137,7 @@ export class MetaMd {
 }
 
 //#region create
-function create(json5string: string, fileContent: String, testContent?: string) {
-  //   Helpers.log(`
-  //   json5string
-  // ${json5string}
-
-
-  //   `)
+function create(json5string: string, fileContent: string, testContent?: string) {
   const metadataJSON = Helpers.parse<MetaMdJSON>(json5string, true);
   // Helpers.log(`metadataJSON.orgFileBasename: ${metadataJSON.orgFileBasename}`)
   const ext = path.extname(metadataJSON.orgFileBasename).replace(/^\./, '');
@@ -143,7 +147,8 @@ function create(json5string: string, fileContent: String, testContent?: string) 
     const projPath = _.maxBy(_.keys(metadataJSON.projects).map(projRelPath => {
       return { path: projRelPath, length: projRelPath.length };
     }), c => c.length)?.path || '';
-    testContent = TestTemplates.testPart(filePath, projPath)
+    const TestTemplatesClass = CLASS.getBy('TestTemplates') as typeof TestTemplates;
+    testContent = TestTemplatesClass.testPart(filePath, projPath, metadataJSON.timeHash);
   }
 
   return `
