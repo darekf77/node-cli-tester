@@ -35,29 +35,32 @@ export class NodeCliTester {
   //#endregion
 
   //#region create test
-  async createTest(testName: string) {
+  public async createTest(testNameOrPathToTestFolder: string) {
     Helpers.log(`Create test from node-cli-tester`);
-    await this.regenerateTest(testName);
+    const c = CliTest.from(this.cwd, path.isAbsolute(testNameOrPathToTestFolder) ? path.basename(testNameOrPathToTestFolder) : testNameOrPathToTestFolder);
+    await c.regenerateFiles();
   }
   //#endregion
 
   //#region create test and add file
-  async createTestAndAddFile(testName: string, absoluteFilePath: string, editorCwd: string = process.cwd()) {
+  public async createTestAndAddFile(testName: string, absoluteFilePath: string, editorCwd: string = process.cwd()) {
     await this.createTest(testName);
     await this.addFileToTest(testName, absoluteFilePath, editorCwd);
   }
   //#endregion
 
   //#region add file to test
-  async addFileToTest(testName: string, filePath: string, editorCwd: string = process.cwd()) {
-    const c = CliTest.from(this.cwd, testName);
+  public async addFileToTest(testNameOrPathToTestFolder: string, filePath: string, editorCwd: string = process.cwd()) {
+    const c = CliTest.from(this.cwd, path.isAbsolute(testNameOrPathToTestFolder) ? path.basename(testNameOrPathToTestFolder) : testNameOrPathToTestFolder);
     await c.metaMd.add(filePath, editorCwd, CLASS.getFromObject(this));
   }
   //#endregion
 
   //#region get all tests names
-  getAllTestsNames() {
-
+  protected getAllTestsNames() {
+    Helpers.outputToVScode(CliTest.allFrom(this.cwd).map(c => {
+      return { label: c.testName, option: c.testDirnamePath };
+    }));
   }
   //#endregion
 
@@ -67,10 +70,18 @@ export class NodeCliTester {
   }
   //#endregion
 
-  //#region regenerate test
-  async regenerateTest(testName: string) {
-    const c = CliTest.from(this.cwd,testName);
-    await c.regenerate();
+  //#region regenerate
+  protected regenerateCliTest(c: CliTest) {
+    c.regenerateEnvironment()
+  }
+
+  public async regenerateEnvironment(timeHash: string) {
+    const c = CliTest.getBy(this.cwd, timeHash);
+    if (c) {
+      this.regenerateCliTest(c);
+    } else {
+      Helpers.error(`Not able to find test with hash ${timeHash}`, false, true);
+    }
   }
   //#endregion
 

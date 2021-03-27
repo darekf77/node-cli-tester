@@ -23,6 +23,11 @@ export class CliTest {
     const tests = folders.map(f => CliTest.from(f)).filter(f => !!f);
     return tests;
   }
+
+  static getBy(cwd: string, timeHash: string): CliTest {
+    return this.allFrom(cwd).find(c => !_.isUndefined(c.metaMd.all.find(c => c.readonlyMetaJson.timeHash === timeHash)));
+  }
+
   static from(
     cwd: string,
     testName?: string,
@@ -86,7 +91,7 @@ export class CliTest {
 
   ) {
     this.testDirnamePath = path.join(
-      cwd,
+      cwd.endsWith(CliTest.NAME_FOR_CLI_TESTS_FOLDER) ? cwd.replace(CliTest.NAME_FOR_CLI_TESTS_FOLDER, '') : cwd, // TODO QUICK_FIX
       CliTest.NAME_FOR_CLI_TESTS_FOLDER,
       _.kebabCase(this.testName),
     );
@@ -102,14 +107,8 @@ export class CliTest {
 
   //#region public api
 
-  //#region clear
-  public clear() {
-    Helpers.foldersFrom(this.testDirnamePath).forEach(c => Helpers.removeFolderIfExists(c));
-  }
-  //#endregion
-
   //#region regenerate
-  public async regenerate() {
+  public async regenerateFiles() {
     if (!Helpers.exists(this.testDirnamePath)) {
       Helpers.mkdirp(this.testDirnamePath);
     }
@@ -121,6 +120,12 @@ export class CliTest {
     TestTemplatesClass.regenerateSpecTs(this.specTsPath, this.testName);
     this.regenerateGitIgnore();
   }
+
+
+  regenerateEnvironment() {
+    // TODO not implement yet
+  }
+
   //#endregion
 
   //#endregion
