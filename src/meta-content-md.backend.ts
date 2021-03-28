@@ -155,19 +155,18 @@ async function create(json5string: string, fileContent: string, testContent?: st
   }
 
   return `
-  \`\`\`json5 ${MetaMd.JSON_PART}
-${json5string}
-   \`\`\`
-
-   \`\`\`${ext} ${MetaMd.FILE_CONTENT_PART}
-${fileContent}
-   \`\`\`
-
-   \`\`\`ts ${MetaMd.TEST_PART}
+\`\`\`ts ${MetaMd.TEST_PART}
 ${testContent}
-   \`\`\`
+\`\`\`
 
-    `.split('\n').map(l => {
+\`\`\`json5 ${MetaMd.JSON_PART}
+${json5string}
+\`\`\`
+
+\`\`\`${ext} ${MetaMd.FILE_CONTENT_PART}
+${fileContent}
+\`\`\`
+`.split('\n').map(l => {
     return l.trim().startsWith('\`\`\`') ? l.trimLeft() : l;
   }).join('\n').trim() + '\n';
 }

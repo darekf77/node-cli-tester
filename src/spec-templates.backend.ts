@@ -29,20 +29,23 @@ export class TestTemplates {
   public static testPart(pathToFile: string, projPath: string, timeHash: string) {
     return `
 ${baseImports}
-import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
+import { Project as ProjectClass } from '${this.PROJECT_ENTITY_LOCATION}';
 
 describe('${projPath}',()=> {
 
   it('Should pass the test with hash ${timeHash}', async  () => {
+   //#region resolve variables
 ${testMeta}
    const cwd = path.join(__dirname,'${timeHash}');
    const relativePathToFile = '${projPath}/${pathToFile}';
    const absolutePathToTestFile = path.join(cwd,relativePathToFile);
    Helpers.remove(cwd);
-   const Project = CLASS.getByName('Project') as typeof Project;
+   const Project = CLASS.getBy('Project') as typeof ProjectClass;
    const proj = Project.From(cwd);
+   //#endregion
+
    proj.run(\`${this.DEFAULT_COMMAND} param1 param2 \`,{ biggerBuffer: false }).sync()
-   expect(true).to.not.be.true;
+   expect(false).to.not.be.true;
  })
 
 })
