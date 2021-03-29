@@ -6,19 +6,23 @@ import { config } from 'tnp-config';
 import { Helpers, Project } from 'tnp-helpers';
 import type { TestTemplates } from './spec-templates.backend';
 import { CLASS } from 'typescript-class-helpers';
+import { BaseProjectStructure } from './base-project-structure.backend';
 //#endregion
 
 //#region models
 export interface MetaMdJSONProject {
   githash?: string;
-  isLinkFrom?: string; tests
+  name?: MetaMdJSONProjects;
+  baseStructureHash?: string;
 }
 
 export type MetaMdJSONProjects = { [projPath: string]: MetaMdJSONProject; };
 
 export interface MetaMdJSON {
   orgFileBasename: string;
+  orgRelativePath: string;
   timeHash: string;
+  firstProjectBasename: string;
   projects: MetaMdJSONProjects;
 }
 //#endregion
@@ -43,8 +47,9 @@ export class MetaMd {
   static async preserveFile(
     originalAnyTypeFile: string,
     destinationFolder: string,
-    editorCwd = process.cwd(),
-    foundProjectFn: (projects: Project[]) => Project[] = void 0
+    editorCwd?: string,
+    foundProjectFn: (projects: Project[]) => Project[] = void 0,
+    baseProjectsStructurePath?: string, // navi-cli folder or current folder
   ) {
     const properDestName = `${path.basename(originalAnyTypeFile)}.meta-content.md`;
     if (!Helpers.isFolder(destinationFolder)) {
@@ -60,16 +65,26 @@ export class MetaMd {
     const mostBaseLocationFound = _.minBy(foundedProjectsInPath, p => p.location.length).location;
     const projects = foundedProjectsInPath
       .reduce((a, b) => {
+        const baseStructureHash = BaseProjectStructure.generate(b).insideIfNotExists(baseProjectsStructurePath);
         return _.merge(a, {
           [path.join(path.basename(mostBaseLocationFound), b.location.replace(mostBaseLocationFound, ''))]: {
-            githash: b.git.lastCommitHash()
+            githash: b.git.lastCommitHash(),
+            name: b.name,
+            baseStructureHash,
           }
-        } as MetaMdJSONProjects)
+        } as MetaMdJSONProject)
       }, {} as MetaMdJSONProjects);
     const timeHash = (+new Date).toString(36);
+    const orgRelativePath = path.join(
+      path.basename(mostBaseLocationFound),
+      originalAnyTypeFile.replace(mostBaseLocationFound, '')
+    );
+
     const c = await MetaMd.create({
       orgFileBasename,
+      orgRelativePath,
       projects,
+      firstProjectBasename: path.basename(mostBaseLocationFound),
       timeHash,
     }, Helpers.readFile(originalAnyTypeFile));
 
@@ -128,9 +143,20 @@ export class MetaMd {
   /**
    * recate original files before any unit/intergration test
    */
-  public recreateIn(cwd = process.cwd()) {
+  public recreate(testCwd: string, cwdProj: string) {
     // recreat whole structure
+    const hashDir = path.join(testCwd, this.json.timeHash);
+    Helpers.mkdirp(hashDir);
 
+    const firstToFind = this.json.projects[this.json.firstProjectBasename].baseStructureHash;
+    const allBaseStructures = BaseProjectStructure.allBaseStructures(cwdProj);
+    const proj = allBaseStructures.find(p => p.baseStructureHash === firstToFind);
+    if (!proj) {
+      Helpers.error(`[node-cli-test][regenerate] base structure was not generated for ${firstToFind}`, false, true);
+    }
+    proj.copyto(hashDir);
+    const fileToWritePath = path.join(hashDir, this.readonlyMetaJson.orgRelativePath);
+    Helpers.writeFile(fileToWritePath, this.fileContent);
   }
   //#endregion
 
@@ -149,7 +175,7 @@ async function create(json5string: string, fileContent: string, testContent?: st
     }), c => c.length)?.path || '';
     let TestTemplatesClass = CLASS.getBy('TestTemplates') as typeof TestTemplates;
     if (!TestTemplatesClass) {
-      TestTemplatesClass = await(await import('./spec-templates.backend')).TestTemplates;
+      TestTemplatesClass = await (await import('./spec-templates.backend')).TestTemplates;
     }
     testContent = TestTemplatesClass.testPart(filePath, projPath, metadataJSON.timeHash);
   }

@@ -5,6 +5,7 @@ import { Helpers, Project } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { CliTest } from './cli-test.backend';
 import { CLASS } from 'typescript-class-helpers';
+import { BaseProjectStructure } from './base-project-structure.backend';
 //#endregion
 
 
@@ -14,6 +15,7 @@ export class NodeCliTester {
   private static _instances = {};
 
   public static classFn = NodeCliTester;
+
   public static foundProjectsFn: (projects: Project[]) => Project[] = void 0;
 
   protected constructor(
@@ -26,12 +28,19 @@ export class NodeCliTester {
         { continueWhenExistedFolderDoesntExists: true })
     }
   }
+
   public static Instance(cwd = process.cwd()) {
     if (!NodeCliTester._instances[cwd]) {
       NodeCliTester._instances[cwd] = new (this.classFn)(cwd);
     }
     return NodeCliTester._instances[cwd] as NodeCliTester;
   }
+
+  public static InstanceNearestTo(cwd: string) {
+    const proj = Project.nearestTo(cwd);
+    return this.Instance(proj.location);
+  }
+
   //#endregion
 
   //#region create test
@@ -64,21 +73,12 @@ export class NodeCliTester {
   }
   //#endregion
 
-  //#region start test
-  startTest(testName: string) {
-
-  }
-  //#endregion
-
   //#region regenerate
-  protected regenerateCliTest(c: CliTest) {
-    c.regenerateEnvironment()
-  }
-
   public async regenerateEnvironment(timeHash: string) {
     const c = CliTest.getBy(this.cwd, timeHash);
-    if (c) {
-      this.regenerateCliTest(c);
+    const m = c?.metaMd.all.find(a => a.readonlyMetaJson.timeHash === timeHash);
+    if (m) {
+      m.recreate(c.testDirnamePath,this.cwd)
     } else {
       Helpers.error(`Not able to find test with hash ${timeHash}`, false, true);
     }

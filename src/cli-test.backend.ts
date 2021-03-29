@@ -57,7 +57,13 @@ export class CliTest {
         return MetaMd.allInstancesFrom(that.testDirnamePath);
       },
       async add(originalFilePath: string, baseCwd: string, NodeCliTestrClass: typeof NodeCliTester) {
-        await MetaMd.preserveFile(originalFilePath, that.testDirnamePath, baseCwd, NodeCliTestrClass.foundProjectsFn);
+        await MetaMd.preserveFile(
+          originalFilePath,
+          that.testDirnamePath,
+          baseCwd,
+          NodeCliTestrClass.foundProjectsFn,
+          that.cwd,
+        );
       }
     }
   }

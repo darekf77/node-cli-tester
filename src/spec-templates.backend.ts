@@ -8,6 +8,7 @@ import { Helpers } from 'tnp-helpers';
 const baseImports = `
 import * as _ from 'lodash';
 import * as path from 'path';
+import chalk from 'chalk';
 import { describe, before, beforeEach, it } from 'mocha';
 import { expect } from 'chai';
 import { CLASS } from 'typescript-class-helpers';
@@ -27,27 +28,32 @@ export class TestTemplates {
 
   //#region create test part
   public static testPart(pathToFile: string, projPath: string, timeHash: string) {
-    return `
+    const testsImports = `
 ${baseImports}
-import { Project as ProjectClass } from '${this.PROJECT_ENTITY_LOCATION}';
+import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
+`;
+    return '\n'
+      // + testsImports
+      + `
 
 describe('${projPath}',()=> {
-
-  it('Should pass the test with hash ${timeHash}', async  () => {
+  const cwdHash = '${timeHash}';
+  it('Should pass the test with hash ' + cwdHash // chalk.hidden(cwdHash)
+    , async  () => {
    //#region resolve variables
 ${testMeta}
-   const cwd = path.join(__dirname,'${timeHash}');
+   const cwd = path.join(__dirname, cwdHash);
    const relativePathToFile = '${projPath}/${pathToFile}';
    const absolutePathToTestFile = path.join(cwd,relativePathToFile);
    Helpers.remove(cwd);
-   const Project = CLASS.getBy('Project') as typeof ProjectClass;
-   const proj = Project.From(cwd);
+   NodeCliTester.InstanceNearestTo(path.dirname(cwd)).regenerateEnvironment(cwdHash);
+   const $Project = Project || CLASS.getBy('Project') as typeof Project;
+   const proj = $Project.From(path.join(cwd, '${_.first(projPath.split('/'))}'));
    //#endregion
 
-   proj.run(\`${this.DEFAULT_COMMAND} param1 param2 \`,{ biggerBuffer: false }).sync()
-   expect(false).to.not.be.true;
+   // @ts-ignore
+   expect(proj.run(\`${this.DEFAULT_COMMAND} param1 param2 \`,{ biggerBuffer: false }).sync()).not.to.throw(Error);
  })
-
 })
   `.trim() + '\n\n';
   }
@@ -60,7 +66,7 @@ ${testMeta}
         //#region content of *.spec.ts
         `
 ${baseImports}
-import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
+import { Project as ProjectClass } from '${this.PROJECT_ENTITY_LOCATION}';
 
 describe('${_.startCase(testName)}', () => {
 
