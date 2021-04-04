@@ -181,23 +181,35 @@ export class MetaMd {
   /**
    * recate original files before any unit/intergration test
    */
-  public recreate(testCwd: string, cwdProj: string) {
+  public recreate(testCwd: string, cwdProj: string, ProjectClass: typeof Project = Project) {
     // recreat whole structure
     const hashDir = path.join(testCwd, this.json.timeHash);
+    Helpers.removeFolderIfExists(hashDir);
     Helpers.mkdirp(hashDir);
 
     const firstToFind = this.json.projects[this.json.firstProjectBasename].baseStructureHash;
     const allBaseStructures = BaseProjectStructure.allBaseStructures(cwdProj);
-    const proj = allBaseStructures.find(p => p.baseStructureHash === firstToFind);
-    if (!proj) {
+    const baseStructure = allBaseStructures.find(p => p.baseStructureHash === firstToFind);
+    if (!baseStructure) {
       Helpers.error(`[node-cli-test][regenerate] base structure was not generated for ${firstToFind}`, false, true);
     }
-    proj.copyto(hashDir);
+    baseStructure.copyto(hashDir);
     this.readonlyMetaJson.orgRelativePathes.forEach((f, i) => {
       const fileToWritePath = path.join(hashDir, f);
       Helpers.writeFile(fileToWritePath, this.fileContentByIndex(i));
-    })
+    });
 
+    const proj = ProjectClass.From(path.join(hashDir, this.readonlyMetaJson.firstProjectBasename));
+    const linksToLInk = proj?.forEmptyStructure().filter(f => !!f.relativeLinkFrom) || [];
+    linksToLInk.forEach(l => {
+      const source = path.resolve(path.join(proj.location, l.relativeLinkFrom));
+      if (Helpers.exists(source)) {
+        const dest = path.resolve(path.join(proj.location, l.relativePath));
+        Helpers.createSymLink(source, dest);
+      } else {
+        Helpers.log(`[cli-tester][recreate-env] not exist ${source}`);
+      }
+    });
   }
   //#endregion
 
@@ -217,7 +229,7 @@ async function create(json5string: string, fileContents: string[], testContent?:
     if (!TestTemplatesClass) {
       TestTemplatesClass = await (await import('./spec-templates.backend')).TestTemplates;
     }
-    testContent = TestTemplatesClass.testPart(metadataJSON.orgFileBasenames, projPath, metadataJSON.timeHash);
+    testContent = TestTemplatesClass.testPart(metadataJSON.orgRelativePathes, projPath, metadataJSON.timeHash);
   }
 
   const filesContestString = fileContents.map(fileContent => {

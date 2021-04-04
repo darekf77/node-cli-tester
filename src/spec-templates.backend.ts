@@ -1,5 +1,6 @@
 //#region imports
 import * as _ from 'lodash';
+import * as path from 'path';
 import { CLASS } from 'typescript-class-helpers';
 import { Helpers } from 'tnp-helpers';
 //#endregion
@@ -13,6 +14,7 @@ import { describe, before, beforeEach, it } from 'mocha';
 import { expect } from 'chai';
 import { CLASS } from 'typescript-class-helpers';
 import { Helpers } from 'tnp-helpers';
+import { config } from 'tnp-config';
 import { NodeCliTester  } from 'node-cli-tester';
 `.trim();
 
@@ -33,22 +35,20 @@ export class TestTemplates {
   it('Should pass the test with hash ' + cwdHash // chalk.hidden(cwdHash)
     , async  () => {
    //#region resolve variables
-${
-''  // testMeta
-}
+${''  // testMeta
+      }
    const projFolder = '${_.first(projPath.split('/'))}';
    const tmpTestEnvironmentFolder = 'tmp-tests-environments';
    const cwd = path.resolve(path.join(__dirname, \`../../../../\${tmpTestEnvironmentFolder}\`, cwdHash));
    const relativePathToFile = {
-     ${pathToFiles.map( pathToFile => `${_.camelCase(pathToFile)} : \`\${projFolder}/${projPath.split('/').slice(1).join('/')}/${pathToFile}\``)
-     .join(',\n     ')}
+     ${pathToFiles.map(pathToFile => `${_.camelCase(path.basename(pathToFile))} : \`${pathToFile.split('/').slice(1).join('/')}\``)
+        .join(',\n     ')}
    };
    const absolutePathToTestFile = {
-     ${pathToFiles.map( pathToFile => `${_.camelCase(pathToFile)} : path.join(cwd,relativePathToFile.${_.camelCase(pathToFile)})`)
-    .join(',\n     ')}
+     ${pathToFiles.map(pathToFile => `${_.camelCase(path.basename(pathToFile))} : path.join(cwd, projFolder, relativePathToFile.${_.camelCase(path.basename(pathToFile))})`)
+        .join(',\n     ')}
    };
-   Helpers.remove(cwd);
-   await NodeCliTester.InstanceNearestTo(path.dirname(cwd)).regenerateEnvironment(cwdHash,tmpTestEnvironmentFolder);
+   await NodeCliTester.InstanceNearestTo(cwd).regenerateEnvironment(cwdHash,tmpTestEnvironmentFolder);
    const $Project = Project || CLASS.getBy('Project') as typeof Project;
    const proj = $Project.From(path.join(cwd,projFolder));
    //#endregion
@@ -60,15 +60,13 @@ ${
 
 
     const testsImports = `
-${
-''  // baseImports
-}
-${
-'' // import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
-}
+${''  // baseImports
+      }
+${'' // import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
+      }
 
 `;
-    return '\n'
+    const result = '\n'
       + testsImports.trim()
       + `
 describe('${projPath}',()=> {
@@ -76,6 +74,7 @@ describe('${projPath}',()=> {
 ${describes}
 });
   `.trim() + '\n\n';
+    return result;
   }
   //#endregion
 

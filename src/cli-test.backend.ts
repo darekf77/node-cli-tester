@@ -96,11 +96,19 @@ export class CliTest {
     public testName: string,
 
   ) {
+    cwd = cwd.endsWith(CliTest.NAME_FOR_CLI_TESTS_FOLDER) ? cwd.replace(CliTest.NAME_FOR_CLI_TESTS_FOLDER, '') : cwd;
+    this.cwd = cwd;
     this.testDirnamePath = path.join(
-      cwd.endsWith(CliTest.NAME_FOR_CLI_TESTS_FOLDER) ? cwd.replace(CliTest.NAME_FOR_CLI_TESTS_FOLDER, '') : cwd, // TODO QUICK_FIX
+      cwd,
       CliTest.NAME_FOR_CLI_TESTS_FOLDER,
       _.kebabCase(this.testName),
     );
+    const pathToTempEnvs = path.join(cwd, config.folder.tmpTestsEnvironments);
+    const pathToEnvs = path.join(cwd, config.folder.testsEnvironments);
+    Helpers.createSymLink(pathToTempEnvs,pathToEnvs,{
+      continueWhenExistedFolderDoesntExists: true
+    });
+
     if (Helpers.exists(this.packageJson5Path)) {
       const testNameFromPJ5 = Helpers.readJson(this.packageJson5Path, {}, true).description;
       if (testNameFromPJ5) {

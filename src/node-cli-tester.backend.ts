@@ -16,6 +16,7 @@ export class NodeCliTester {
   private static _instances = {};
 
   public static classFn = NodeCliTester;
+  public static projectClassFn = Project;
 
   public static foundProjectsFn: (projects: Project[]) => Project[] = void 0;
 
@@ -117,16 +118,11 @@ export class NodeCliTester {
     const c = CliTest.getBy(this.cwd, timeHash);
     const m = c?.metaMd.all.find(a => a.readonlyMetaJson.timeHash === timeHash);
     if (m) {
-      m.recreate(tempFolder, this.cwd)
+      const ProjectClass = (CLASS.getFromObject(this) as typeof NodeCliTester).projectClassFn;
+      m.recreate(tempFolder, this.cwd, ProjectClass);
     } else {
       Helpers.error(`Not able to find test with hash ${timeHash}`, false, true);
     }
-  }
-  //#endregion
-
-  //#region create base structure
-  createBaseStructure(pathToBaseStructure: string) {
-
   }
   //#endregion
 
