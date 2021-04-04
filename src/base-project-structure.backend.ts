@@ -20,8 +20,8 @@ export class BaseProjectStructure {
 
   }
 
-  copyto(destinationCwd: string) {
-    Helpers.copy(this.cwd, path.join(destinationCwd, this.projectPathBasename));
+  copyto(destinationCwd: string, basename?: string) {
+    Helpers.copy(this.cwd, path.join(destinationCwd, basename ? basename : this.projectPathBasename));
   }
 
   static allBaseStructures(cwd) {

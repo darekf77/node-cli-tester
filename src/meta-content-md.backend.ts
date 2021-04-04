@@ -194,6 +194,19 @@ export class MetaMd {
       Helpers.error(`[node-cli-test][regenerate] base structure was not generated for ${firstToFind}`, false, true);
     }
     baseStructure.copyto(hashDir);
+    _.keys(this.json.projects)
+      .filter(key => key !== this.json.firstProjectBasename)
+      .map(key => {
+        const baseStructureHashChild = this.json.projects[key].baseStructureHash;
+        const childBaseStruct = allBaseStructures.find(p => p.baseStructureHash === baseStructureHashChild);
+        if (childBaseStruct) {
+          childBaseStruct.copyto(path.join(
+            hashDir,
+            path.dirname(key)
+          ), path.basename(key));
+        }
+      })
+
     this.readonlyMetaJson.orgRelativePathes.forEach((f, i) => {
       const fileToWritePath = path.join(hashDir, f);
       Helpers.writeFile(fileToWritePath, this.fileContentByIndex(i));
