@@ -19,6 +19,9 @@ export async function run<T extends NodeCliTester = NodeCliTester>(
 }
 
 function parseArr(a: string) {
+  if(a === 'null') {
+    return null;
+  }
   if (a.startsWith('[') && a.endsWith(']')) {
     const elems = a.slice(1, a.length - 1).split(',');
     return elems;

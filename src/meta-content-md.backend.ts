@@ -23,7 +23,6 @@ export interface MetaMdJSON {
   orgRelativePathes: string[];
   timeHash: string;
   firstProjectBasename: string;
-  mostBaseLocationFound: string;
   projects: MetaMdJSONProjects;
 }
 //#endregion
@@ -51,31 +50,21 @@ export class MetaMd {
     editorCwd: string,
     foundProjectFn: (projects: Project[]) => Project[] = (a) => a,
     baseProjectsStructurePath: string, // navi-cli folder or current folder,
-    overrideThisFile = void 0 as string
+    overrideThisFileName = void 0 as string,
+    overrideTimehash = void 0
   ) {
-    const firstFile = overrideThisFile ?
-      originalAnyTypeFiles.find(f => f.endsWith(overrideThisFile)) :
-      _.first(originalAnyTypeFiles);
-    const properDestName = `${path.basename(firstFile)}.${config.file.meta_config_md}`;
+
+    const properDestName = overrideThisFileName ? overrideThisFileName :
+      `${path.basename(_.first(originalAnyTypeFiles))}.${config.file.meta_config_md}`; // TODO later menu to confirm name
+
     if (!Helpers.isFolder(destinationFolder)) {
       Helpers.error(`[tnp-helpers][meta-content-md] Destination folder "${destinationFolder}"
        is not a folder`, false, true)
     }
 
-    let foundedProjectsInPath = [];
-    for (let index = 0; index < originalAnyTypeFiles.length; index++) {
-      const fileAbsPath = originalAnyTypeFiles[index];
-      foundedProjectsInPath = [
-        ...foundedProjectsInPath,
-        ...Project.allProjectFrom(fileAbsPath, editorCwd)
-      ];
-      if (foundProjectFn) {
-        foundedProjectsInPath = foundProjectFn(Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location'));
-      }
-    }
-    foundedProjectsInPath = Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location');
-    console.log(foundedProjectsInPath.map(p => p.location))
+    let foundedProjectsInPath = resolveFoundedProject(originalAnyTypeFiles, editorCwd, foundProjectFn);
     const mostBaseLocationFound = _.minBy(foundedProjectsInPath, p => p.location.length).location;
+    // console.log(foundedProjectsInPath.map(p => p.location))
     const projects = foundedProjectsInPath
       .reduce((a, b) => {
         const baseStructureHash = BaseProjectStructure.generate(b).insideIfNotExists(baseProjectsStructurePath);
@@ -87,7 +76,7 @@ export class MetaMd {
           }
         } as MetaMdJSONProject)
       }, {} as MetaMdJSONProjects);
-    const timeHash = (+new Date).toString(36);
+    const timeHash = overrideTimehash ? overrideTimehash : (+new Date).toString(36);
 
     const c = await MetaMd.create({
       orgFileBasenames: originalAnyTypeFiles.map(a => path.basename(a)),
@@ -96,7 +85,6 @@ export class MetaMd {
       }),
       projects,
       firstProjectBasename: path.basename(mostBaseLocationFound),
-      mostBaseLocationFound,
       timeHash,
     }, originalAnyTypeFiles.map(a => Helpers.readFile(a)));
 
@@ -111,7 +99,9 @@ export class MetaMd {
     foundProjectFn: (projects: Project[]) => Project[] = void 0,
     baseProjectsStructurePath?: string, // navi-cli folder or current folder
   ) {
-    const mostBaseLocationFound = this.readonlyMetaJson.mostBaseLocationFound;
+    let foundedProjectsInPath = resolveFoundedProject(newFilesPathes, editorCwd, foundProjectFn);
+    const mostBaseLocationFound = _.minBy(foundedProjectsInPath, p => p.location.length).location;
+
     newFilesPathes = Helpers.arrays.uniqArray([
       ...newFilesPathes,
       ...this.readonlyMetaJson.orgRelativePathes.map(a => {
@@ -119,13 +109,20 @@ export class MetaMd {
       }),
     ]);
 
+    newFilesPathes.forEach(f => {
+      if (!Helpers.exists(f)) {
+        Helpers.error(`File doesn't exists`, false, true);
+      }
+    })
+
     MetaMd.preserveFiles(
       newFilesPathes,
       destinationFolder,
       editorCwd,
       foundProjectFn,
       baseProjectsStructurePath,
-      path.basename(this.filePath).replace(`.${config.file.meta_config_md}`, ''),
+      path.basename(this.filePath),
+      this.readonlyMetaJson.timeHash,
     );
   }
 
@@ -211,7 +208,6 @@ async function create(json5string: string, fileContents: string[], testContent?:
   const metadataJSON = Helpers.parse<MetaMdJSON>(json5string, true);
   // Helpers.log(`metadataJSON.orgFileBasename: ${metadataJSON.orgFileBasename}`)
   const ext = path.extname(_.first(metadataJSON.orgFileBasenames)).replace(/^\./, '');
-  // const filePath = _.first(); // TODO @LAST
 
   if (!testContent) {
     const projPath = _.maxBy(_.keys(metadataJSON.projects).map(projRelPath => {
@@ -228,7 +224,7 @@ async function create(json5string: string, fileContents: string[], testContent?:
     return `\`\`\`${ext} ${MetaMd.FILE_CONTENT_PART}
 ${fileContent}
 \`\`\``
-  })
+  }).join('\n\n')
 
   return `
 \`\`\`ts ${MetaMd.TEST_PART}
@@ -276,6 +272,21 @@ function extract(content: string, PARTS_TO_FIND: string): string[] {
 }
 //#endregion
 
+function resolveFoundedProject(originalAnyTypeFiles: string[], editorCwd: string, foundProjectFn: Function) {
+  let foundedProjectsInPath = [];
+  for (let index = 0; index < originalAnyTypeFiles.length; index++) {
+    const fileAbsPath = originalAnyTypeFiles[index];
+    foundedProjectsInPath = [
+      ...foundedProjectsInPath,
+      ...Project.allProjectFrom(fileAbsPath, editorCwd)
+    ];
+    if (foundProjectFn) {
+      foundedProjectsInPath = foundProjectFn(Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location'));
+    }
+  }
+  foundedProjectsInPath = Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location');
+  return foundedProjectsInPath;
+}
 
 //#endregion
 

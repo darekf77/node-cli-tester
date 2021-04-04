@@ -23,63 +23,72 @@ const testMeta = `
 //#endregion
 @CLASS.NAME('TestTemplates')
 export class TestTemplates {
-  public static DEFAULT_COMMAND = `my-command-to-run`;
+  public static DEFAULT_COMMAND = `echo "hello world"`;
   public static PROJECT_ENTITY_LOCATION = `tnp-helpers`;
 
   //#region create test part
   public static testPart(pathToFiles: string[], projPath: string, timeHash: string) {
-    const describes = pathToFiles.map(pathToFile => {
-return `
+    const describes = `
 
-  it('Should pass the test for file ${pathToFile} - ' + cwdHash // chalk.hidden(cwdHash)
+  it('Should pass the test with hash ' + cwdHash // chalk.hidden(cwdHash)
     , async  () => {
    //#region resolve variables
 ${
 ''  // testMeta
 }
-   const cwd = path.join(__dirname, cwdHash);
-   const relativePathToFile = '${projPath}/${pathToFile}';
-   const absolutePathToTestFile = path.join(cwd,relativePathToFile);
+   const projFolder = '${_.first(projPath.split('/'))}';
+   const tmpTestEnvironmentFolder = 'tmp-tests-environments';
+   const cwd = path.resolve(path.join(__dirname, \`../../../../\${tmpTestEnvironmentFolder}\`, cwdHash));
+   const relativePathToFile = {
+     ${pathToFiles.map( pathToFile => `${_.camelCase(pathToFile)} : \`\${projFolder}/${projPath.split('/').slice(1).join('/')}/${pathToFile}\``)
+     .join(',\n     ')}
+   };
+   const absolutePathToTestFile = {
+     ${pathToFiles.map( pathToFile => `${_.camelCase(pathToFile)} : path.join(cwd,relativePathToFile.${_.camelCase(pathToFile)})`)
+    .join(',\n     ')}
+   };
    Helpers.remove(cwd);
-   NodeCliTester.InstanceNearestTo(path.dirname(cwd)).regenerateEnvironment(cwdHash);
+   await NodeCliTester.InstanceNearestTo(path.dirname(cwd)).regenerateEnvironment(cwdHash,tmpTestEnvironmentFolder);
    const $Project = Project || CLASS.getBy('Project') as typeof Project;
-   const proj = $Project.From(path.join(cwd, '${_.first(projPath.split('/'))}'));
+   const proj = $Project.From(path.join(cwd,projFolder));
    //#endregion
 
    // @ts-ignore
-   expect(proj.run(\`${this.DEFAULT_COMMAND} param1 param2 \`,{ biggerBuffer: false }).sync()).not.to.throw(Error);
- })
-`
-    }).join('\n');
+   expect(proj.runCommandGetString(\`${this.DEFAULT_COMMAND}\`)).to.be.eq('hello world');
+ });
+`;
 
 
     const testsImports = `
-${baseImports}
-import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
+${
+''  // baseImports
+}
+${
+'' // import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
+}
 
 `;
     return '\n'
-      + testsImports
+      + testsImports.trim()
       + `
-
 describe('${projPath}',()=> {
   const cwdHash = '${timeHash}';
 ${describes}
-})
+});
   `.trim() + '\n\n';
   }
   //#endregion
 
   //#region regenerate spec ts
-  public static regenerateSpecTs(specTsPath: string, testName: string) {
+  public static regenerateSpecTs(specTsPath: string, testRealName: string) {
     if (!Helpers.exists(specTsPath)) {
       Helpers.writeFile(specTsPath,
         //#region content of *.spec.ts
         `
 ${baseImports}
-import { Project as ProjectClass } from '${this.PROJECT_ENTITY_LOCATION}';
+import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
 
-describe('${_.startCase(testName)}', () => {
+describe('${testRealName}', () => {
 
   // PUT ALL YOUR TESTS HERE
 

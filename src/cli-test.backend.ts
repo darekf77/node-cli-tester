@@ -127,11 +127,6 @@ export class CliTest {
     this.regenerateGitIgnore();
   }
 
-
-  regenerateEnvironment() {
-    // TODO not implement yet
-  }
-
   //#endregion
 
   //#endregion

@@ -72,11 +72,12 @@ export class NodeCliTester {
     await c.metaMd.add(filePath, editorCwd, CLASS.getFromObject(this));
   }
 
-  public async addFilesToMdContent(testNameOrPathToTestFolder: string, mdContentFileBasenameOrPath: string, filePaths: string[], editorCwd: string = process.cwd()) {
+  public async addFilesToMdContent(testNameOrPathToTestFolder: string, mdContentFileBasenameOrPath: string | null, filePaths: string[], editorCwd: string = process.cwd()) {
     const c = CliTest.from(this.cwd, path.isAbsolute(testNameOrPathToTestFolder) ? path.basename(testNameOrPathToTestFolder) : testNameOrPathToTestFolder);
-    const mdContentFileBasename = path.isAbsolute(mdContentFileBasenameOrPath)
-      ? path.basename(mdContentFileBasenameOrPath) : mdContentFileBasenameOrPath;
-    const m = c.metaMd.all.find(a => a.basename === mdContentFileBasename);
+
+    const mdContentFileBasename = !!mdContentFileBasenameOrPath && (path.isAbsolute(mdContentFileBasenameOrPath)
+      ? path.basename(mdContentFileBasenameOrPath) : mdContentFileBasenameOrPath);
+    const m = mdContentFileBasename && c.metaMd.all.find(a => a.basename === mdContentFileBasename);
     if (m) {
       const NodeCliTestrClass = CLASS.getFromObject(this);
       m.addFiles(filePaths, c.testDirnamePath, editorCwd, NodeCliTestrClass.foundProjectsFn, c.cwd);
@@ -88,9 +89,10 @@ export class NodeCliTester {
 
   //#region get all tests names
   protected getAllTestsNames() {
-    Helpers.outputToVScode(CliTest.allFrom(this.cwd).map(c => {
+    const names = CliTest.allFrom(this.cwd).map(c => {
       return { label: c.testName, option: c.testDirnamePath };
-    }));
+    });
+    Helpers.outputToVScode(names);
   }
 
   protected getMdContentFilesForTest(testNameOrPathToTestFolder: string) {
@@ -108,11 +110,14 @@ export class NodeCliTester {
   //#endregion
 
   //#region regenerate
-  public async regenerateEnvironment(timeHash: string) {
+  public async regenerateEnvironment(timeHash: string, tempFolder = config.folder.tmpTestsEnvironments) {
+    if (!path.isAbsolute(tempFolder)) {
+      tempFolder = path.join(this.cwd, tempFolder);
+    }
     const c = CliTest.getBy(this.cwd, timeHash);
     const m = c?.metaMd.all.find(a => a.readonlyMetaJson.timeHash === timeHash);
     if (m) {
-      m.recreate(c.testDirnamePath, this.cwd)
+      m.recreate(tempFolder, this.cwd)
     } else {
       Helpers.error(`Not able to find test with hash ${timeHash}`, false, true);
     }
