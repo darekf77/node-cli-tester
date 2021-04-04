@@ -6,10 +6,11 @@ import { Helpers } from 'tnp-helpers';
 import { MetaMd } from '../meta-content-md.backend';
 // import type { MetaMdJSON } from '../meta-content-md.backend';
 import { TestTemplates } from '../spec-templates.backend';
+import { config } from 'tnp-config';
 TestTemplates.testPart; // TODO QUICK FIX for CLASS.getBy in test
 
 // const instance = BrowserDB.instance;
-const readOnlyFileForTemplate = path.join(process.cwd(), 'tmp-meta-md-file-example.ts.meta-content.md');
+const readOnlyFileForTemplate = path.join(process.cwd(), `tmp-meta-md-file-example.ts.${config.file.meta_config_md}`);
 
 
 describe('tnp-helpers meta-content.md', () => {

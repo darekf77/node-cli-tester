@@ -27,21 +27,16 @@ export class TestTemplates {
   public static PROJECT_ENTITY_LOCATION = `tnp-helpers`;
 
   //#region create test part
-  public static testPart(pathToFile: string, projPath: string, timeHash: string) {
-    const testsImports = `
-${baseImports}
-import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
-`;
-    return '\n'
-      // + testsImports
-      + `
+  public static testPart(pathToFiles: string[], projPath: string, timeHash: string) {
+    const describes = pathToFiles.map(pathToFile => {
+return `
 
-describe('${projPath}',()=> {
-  const cwdHash = '${timeHash}';
-  it('Should pass the test with hash ' + cwdHash // chalk.hidden(cwdHash)
+  it('Should pass the test for file ${pathToFile} - ' + cwdHash // chalk.hidden(cwdHash)
     , async  () => {
    //#region resolve variables
-${testMeta}
+${
+''  // testMeta
+}
    const cwd = path.join(__dirname, cwdHash);
    const relativePathToFile = '${projPath}/${pathToFile}';
    const absolutePathToTestFile = path.join(cwd,relativePathToFile);
@@ -54,6 +49,22 @@ ${testMeta}
    // @ts-ignore
    expect(proj.run(\`${this.DEFAULT_COMMAND} param1 param2 \`,{ biggerBuffer: false }).sync()).not.to.throw(Error);
  })
+`
+    }).join('\n');
+
+
+    const testsImports = `
+${baseImports}
+import { Project } from '${this.PROJECT_ENTITY_LOCATION}';
+
+`;
+    return '\n'
+      + testsImports
+      + `
+
+describe('${projPath}',()=> {
+  const cwdHash = '${timeHash}';
+${describes}
 })
   `.trim() + '\n\n';
   }

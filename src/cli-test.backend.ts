@@ -11,7 +11,7 @@ import * as json5 from 'json5';
 //#endregion
 
 export class CliTest {
-  static readonly NAME_FOR_CLI_TESTS_FOLDER = 'src/tests';
+  static readonly NAME_FOR_CLI_TESTS_FOLDER = 'src/tests/tests-cli';
   readonly testDirnamePath: string;
 
   //#region singleton  / static inst
@@ -56,8 +56,8 @@ export class CliTest {
       get all() {
         return MetaMd.allInstancesFrom(that.testDirnamePath);
       },
-      async add(originalFilePath: string, baseCwd: string, NodeCliTestrClass: typeof NodeCliTester) {
-        await MetaMd.preserveFile(
+      async add(originalFilePath: string[], baseCwd: string, NodeCliTestrClass: typeof NodeCliTester) {
+        await MetaMd.preserveFiles(
           originalFilePath,
           that.testDirnamePath,
           baseCwd,

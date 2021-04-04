@@ -19,10 +19,11 @@ export interface MetaMdJSONProject {
 export type MetaMdJSONProjects = { [projPath: string]: MetaMdJSONProject; };
 
 export interface MetaMdJSON {
-  orgFileBasename: string;
-  orgRelativePath: string;
+  orgFileBasenames: string[];
+  orgRelativePathes: string[];
   timeHash: string;
   firstProjectBasename: string;
+  mostBaseLocationFound: string;
   projects: MetaMdJSONProjects;
 }
 //#endregion
@@ -38,29 +39,41 @@ export class MetaMd {
   static readonly TEST_PART = '@testPart';
 
   //#region static fields / create
-  static async create(json: MetaMdJSON, fileContent: string, testContent?: string) {
+  static async create(json: MetaMdJSON, fileContent: string[], testContent?: string) {
     return await create((_.isObject(json) ? Helpers.stringify(json) : json) as any, fileContent, testContent);
   }
   //#endregion
 
   //#region static fields / preserve file
-  static async preserveFile(
-    originalAnyTypeFile: string,
+  static async preserveFiles(
+    originalAnyTypeFiles: string[],
     destinationFolder: string,
-    editorCwd?: string,
-    foundProjectFn: (projects: Project[]) => Project[] = void 0,
-    baseProjectsStructurePath?: string, // navi-cli folder or current folder
+    editorCwd: string,
+    foundProjectFn: (projects: Project[]) => Project[] = (a) => a,
+    baseProjectsStructurePath: string, // navi-cli folder or current folder,
+    overrideThisFile = void 0 as string
   ) {
-    const properDestName = `${path.basename(originalAnyTypeFile)}.meta-content.md`;
+    const firstFile = overrideThisFile ?
+      originalAnyTypeFiles.find(f => f.endsWith(overrideThisFile)) :
+      _.first(originalAnyTypeFiles);
+    const properDestName = `${path.basename(firstFile)}.${config.file.meta_config_md}`;
     if (!Helpers.isFolder(destinationFolder)) {
       Helpers.error(`[tnp-helpers][meta-content-md] Destination folder "${destinationFolder}"
        is not a folder`, false, true)
     }
-    const orgFileBasename = path.basename(originalAnyTypeFile);
-    let foundedProjectsInPath = Project.allProjectFrom(originalAnyTypeFile, editorCwd);
-    if (foundProjectFn) {
-      foundedProjectsInPath = foundProjectFn(foundedProjectsInPath);
+
+    let foundedProjectsInPath = [];
+    for (let index = 0; index < originalAnyTypeFiles.length; index++) {
+      const fileAbsPath = originalAnyTypeFiles[index];
+      foundedProjectsInPath = [
+        ...foundedProjectsInPath,
+        ...Project.allProjectFrom(fileAbsPath, editorCwd)
+      ];
+      if (foundProjectFn) {
+        foundedProjectsInPath = foundProjectFn(Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location'));
+      }
     }
+    foundedProjectsInPath = Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location');
     console.log(foundedProjectsInPath.map(p => p.location))
     const mostBaseLocationFound = _.minBy(foundedProjectsInPath, p => p.location.length).location;
     const projects = foundedProjectsInPath
@@ -75,22 +88,47 @@ export class MetaMd {
         } as MetaMdJSONProject)
       }, {} as MetaMdJSONProjects);
     const timeHash = (+new Date).toString(36);
-    const orgRelativePath = path.join(
-      path.basename(mostBaseLocationFound),
-      originalAnyTypeFile.replace(mostBaseLocationFound, '')
-    );
 
     const c = await MetaMd.create({
-      orgFileBasename,
-      orgRelativePath,
+      orgFileBasenames: originalAnyTypeFiles.map(a => path.basename(a)),
+      orgRelativePathes: originalAnyTypeFiles.map(a => {
+        return path.join(path.basename(mostBaseLocationFound), a.replace(mostBaseLocationFound, ''))
+      }),
       projects,
       firstProjectBasename: path.basename(mostBaseLocationFound),
+      mostBaseLocationFound,
       timeHash,
-    }, Helpers.readFile(originalAnyTypeFile));
+    }, originalAnyTypeFiles.map(a => Helpers.readFile(a)));
 
     Helpers.writeFile(path.join(destinationFolder, properDestName), c);
   }
   //#endregion
+
+  addFiles(
+    newFilesPathes: string[],
+    destinationFolder: string,
+    editorCwd?: string,
+    foundProjectFn: (projects: Project[]) => Project[] = void 0,
+    baseProjectsStructurePath?: string, // navi-cli folder or current folder
+  ) {
+    const mostBaseLocationFound = this.readonlyMetaJson.mostBaseLocationFound;
+    newFilesPathes = Helpers.arrays.uniqArray([
+      ...newFilesPathes,
+      ...this.readonlyMetaJson.orgRelativePathes.map(a => {
+        return path.join(path.dirname(mostBaseLocationFound), a)
+      }),
+    ]);
+
+    MetaMd.preserveFiles(
+      newFilesPathes,
+      destinationFolder,
+      editorCwd,
+      foundProjectFn,
+      baseProjectsStructurePath,
+      path.basename(this.filePath).replace(`.${config.file.meta_config_md}`, ''),
+    );
+  }
+
 
   //#region static fields / handle instance from meta-content.md file
   static instanceFrom(filePath: string): MetaMd {
@@ -110,7 +148,7 @@ export class MetaMd {
   private get json(): MetaMdJSON {
     const content = Helpers.readFile(this.filePath) || '';
     try {
-      const extracted = extract(content, MetaMd.JSON_PART);
+      const extracted = _.first(extract(content, MetaMd.JSON_PART));
       const parsed = Helpers.parse(extracted, true);
       return parsed;
     } catch (error) {
@@ -122,20 +160,23 @@ export class MetaMd {
     return Object.freeze(this.json);
   }
 
-  public get fileContent(): string {
+  public fileContentByIndex(i: number): string {
     const content = Helpers.readFile(this.filePath) || '';
-    return extract(content, MetaMd.FILE_CONTENT_PART);
+    return extract(content, MetaMd.FILE_CONTENT_PART)[i];
   }
 
-  private get testContent(): string {
-    const content = Helpers.readFile(this.filePath) || '';
-    return extract(content, MetaMd.TEST_PART);
+  get basename() {
+    return path.basename(this.filePath);
+  }
+
+  get dirname() {
+    return path.dirname(this.filePath);
   }
   //#endregion
 
   //#region constructor
   constructor(
-    private readonly filePath: string,
+    public readonly filePath: string,
   ) { }
   //#endregion
 
@@ -155,19 +196,22 @@ export class MetaMd {
       Helpers.error(`[node-cli-test][regenerate] base structure was not generated for ${firstToFind}`, false, true);
     }
     proj.copyto(hashDir);
-    const fileToWritePath = path.join(hashDir, this.readonlyMetaJson.orgRelativePath);
-    Helpers.writeFile(fileToWritePath, this.fileContent);
+    this.readonlyMetaJson.orgRelativePathes.forEach((f, i) => {
+      const fileToWritePath = path.join(hashDir, f);
+      Helpers.writeFile(fileToWritePath, this.fileContentByIndex(i));
+    })
+
   }
   //#endregion
 
 }
 
 //#region create
-async function create(json5string: string, fileContent: string, testContent?: string) {
+async function create(json5string: string, fileContents: string[], testContent?: string) {
   const metadataJSON = Helpers.parse<MetaMdJSON>(json5string, true);
   // Helpers.log(`metadataJSON.orgFileBasename: ${metadataJSON.orgFileBasename}`)
-  const ext = path.extname(metadataJSON.orgFileBasename).replace(/^\./, '');
-  const filePath = metadataJSON.orgFileBasename; // TODO
+  const ext = path.extname(_.first(metadataJSON.orgFileBasenames)).replace(/^\./, '');
+  // const filePath = _.first(); // TODO @LAST
 
   if (!testContent) {
     const projPath = _.maxBy(_.keys(metadataJSON.projects).map(projRelPath => {
@@ -177,8 +221,14 @@ async function create(json5string: string, fileContent: string, testContent?: st
     if (!TestTemplatesClass) {
       TestTemplatesClass = await (await import('./spec-templates.backend')).TestTemplates;
     }
-    testContent = TestTemplatesClass.testPart(filePath, projPath, metadataJSON.timeHash);
+    testContent = TestTemplatesClass.testPart(metadataJSON.orgFileBasenames, projPath, metadataJSON.timeHash);
   }
+
+  const filesContestString = fileContents.map(fileContent => {
+    return `\`\`\`${ext} ${MetaMd.FILE_CONTENT_PART}
+${fileContent}
+\`\`\``
+  })
 
   return `
 \`\`\`ts ${MetaMd.TEST_PART}
@@ -189,9 +239,7 @@ ${testContent}
 ${json5string}
 \`\`\`
 
-\`\`\`${ext} ${MetaMd.FILE_CONTENT_PART}
-${fileContent}
-\`\`\`
+${filesContestString}
 `.split('\n').map(l => {
     return l.trim().startsWith('\`\`\`') ? l.trimLeft() : l;
   }).join('\n').trim() + '\n';
@@ -199,12 +247,14 @@ ${fileContent}
 
 //#endregion
 
+
 //#region extract data parts from content md file
-function extract(content: string, PART_TO_FIND: string) {
+function extract(content: string, PARTS_TO_FIND: string): string[] {
   if (!content) {
     return;
   }
-  const lines = [];
+  const parts = [] as string[];
+  let lines = [];
   const allLines = content.split('\n');
   let pushingActive = false;
   for (let index = 0; index < allLines.length; index++) {
@@ -212,16 +262,20 @@ function extract(content: string, PART_TO_FIND: string) {
     const line = orgLine.trim();
     if (pushingActive) {
       if (line.startsWith('\`\`\`')) {
-        break;
+        parts.push(lines.join('\n'));
+        lines = []
       } else {
         lines.push(orgLine);
       }
     }
-    if (line.startsWith('\`\`\`') && (line.search(PART_TO_FIND) !== -1)) {
+    if (line.startsWith('\`\`\`') && (line.search(PARTS_TO_FIND) !== -1)) {
       pushingActive = true;
     }
   }
-  return lines.join('\n');
+  return parts;
 }
+//#endregion
+
+
 //#endregion
 

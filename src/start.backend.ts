@@ -9,9 +9,19 @@ export async function run<T extends NodeCliTester = NodeCliTester>(
   const command: Lowercase<keyof NodeCliTester> = argsv.shift().toLowerCase() as any;
   for (const key in instance) {
     if (key.toLowerCase() === command && _.isFunction(instance[key])) {
-      const argsToPass = argsv.filter(a => !a.startsWith('--'));
+      const argsToPass = argsv
+        .filter(a => !a.startsWith('--'))
+        .map(a => parseArr(a));
       await Helpers.runSyncOrAsync([key, instance], ...argsToPass);
     }
   }
   process.exit(0);
+}
+
+function parseArr(a: string) {
+  if (a.startsWith('[') && a.endsWith(']')) {
+    const elems = a.slice(1, a.length - 1).split(',');
+    return elems;
+  }
+  return a;
 }
