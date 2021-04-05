@@ -181,9 +181,12 @@ export class MetaMd {
   /**
    * recate original files before any unit/intergration test
    */
-  public recreate(testCwd: string, cwdProj: string, ProjectClass: typeof Project = Project) {
+  public recreate(testCwd: string, cwdProj: string, ProjectClass: typeof Project = Project, onlyIfNotExists = false) {
     // recreat whole structure
     const hashDir = path.join(testCwd, this.json.timeHash);
+    if (onlyIfNotExists && Helpers.exists(hashDir)) {
+      return;
+    }
     Helpers.removeFolderIfExists(hashDir);
     Helpers.mkdirp(hashDir);
 

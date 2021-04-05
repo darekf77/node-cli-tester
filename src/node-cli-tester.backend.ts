@@ -205,7 +205,7 @@ export class NodeCliTester {
   //#endregion
 
   //#region regenerate / regenerate environment function
-  public async regenerateEnvironment(timeHash: string, tempFolder = config.folder.tmpTestsEnvironments) {
+  public async regenerateEnvironment(timeHash: string, tempFolder = config.folder.tmpTestsEnvironments, onlyIfNotExists = false) {
     const NodeCliTesterClass = (CLASS.getFromObject(this) as typeof NodeCliTester);
     if (timeHash === NodeCliTesterClass.ACTIONS.REGENERATE_LAST_HASH) {
       timeHash = Helpers.readFile(this.lastRegenerateHashFile, '');
@@ -217,7 +217,7 @@ export class NodeCliTester {
     const m = c?.metaMd.all.find(a => a.readonlyMetaJson.timeHash === timeHash);
     if (m) {
       const ProjectClass = NodeCliTesterClass.projectClassFn;
-      m.recreate(tempFolder, this.cwd, ProjectClass);
+      m.recreate(tempFolder, this.cwd, ProjectClass, onlyIfNotExists);
       Helpers.writeFile(this.lastRegenerateHashFile, timeHash);
     } else {
       Helpers.error(`Not able to find test with hash ${timeHash}`, false, true);
