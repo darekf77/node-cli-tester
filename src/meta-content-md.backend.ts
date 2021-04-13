@@ -48,7 +48,7 @@ export class MetaMd {
     originalAnyTypeFiles: string[],
     destinationFolder: string,
     editorCwd: string,
-    foundProjectFn: (projects: Project[]) => Project[] = (a) => a,
+    foundProjectsFn: (projects: Project[]) => Project[] = (a) => a,
     baseProjectsStructurePath: string, // navi-cli folder or current folder,
     overrideThisFileName = void 0 as string,
     overrideTimehash = void 0
@@ -62,7 +62,7 @@ export class MetaMd {
        is not a folder`, false, true)
     }
 
-    let foundedProjectsInPath = resolveFoundedProject(originalAnyTypeFiles, editorCwd, foundProjectFn);
+    let foundedProjectsInPath = resolveFoundedProject(originalAnyTypeFiles, editorCwd, foundProjectsFn);
     const mostBaseLocationFound = _.minBy(foundedProjectsInPath, p => p.location.length).location;
     // console.log(foundedProjectsInPath.map(p => p.location))
     const projects = foundedProjectsInPath
