@@ -1,13 +1,11 @@
 //#region imports
-import * as _ from 'lodash';
-import * as path from 'path';
+import { _, path } from 'tnp-core';
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { MetaMd } from './meta-content-md.backend';
 import type { TestTemplates } from './spec-templates.backend';
 import type { NodeCliTester } from './node-cli-tester.backend';
 import { CLASS } from 'typescript-class-helpers';
-import * as json5 from 'json5';
 //#endregion
 
 export class CliTest {

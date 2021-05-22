@@ -1,11 +1,9 @@
 //#region imports
-import * as _ from 'lodash';
-import * as path from 'path';
+import { path, _ } from 'tnp-core';
 import { Helpers, Project } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { CliTest } from './cli-test.backend';
 import { CLASS } from 'typescript-class-helpers';
-import { BaseProjectStructure } from './base-project-structure.backend';
 import { MetaMd } from './meta-content-md.backend';
 //#endregion
 

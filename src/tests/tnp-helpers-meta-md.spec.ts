@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-import * as path from 'path';
+import { _, path } from 'tnp-core';
 import { describe, before, beforeEach, it } from 'mocha';
 import { expect } from 'chai';
 import { Helpers } from 'tnp-helpers';
@@ -29,13 +28,13 @@ describe('tnp-helpers meta-content.md', () => {
 
   it('Should properly extact file content', () => {
     const ins = MetaMd.instanceFrom(readOnlyFileForTemplate);
-    expect(ins.fileContent).to.be.eq(tsPart());
+    expect(ins. fileContentByIndex(0)).to.be.eq(tsPart());
   });
 
 })
 
 async function metaContentFile() {
-  return await MetaMd.create(json5Part() as any, tsPart());
+  return await MetaMd.create(json5Part() as any, tsPart() as any);
 }
 
 function json5Part() {

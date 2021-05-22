@@ -1,6 +1,5 @@
 //#region imports
-import * as _ from 'lodash';
-import * as path from 'path';
+import { path, _ } from 'tnp-core';
 import { CLASS } from 'typescript-class-helpers';
 import { Helpers } from 'tnp-helpers';
 //#endregion

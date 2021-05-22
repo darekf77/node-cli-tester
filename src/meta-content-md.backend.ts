@@ -1,7 +1,6 @@
 //#region imports
 import * as glob from 'glob';
-import * as path from 'path';
-import * as _ from 'lodash';
+import { _, path } from 'tnp-core';
 import { config } from 'tnp-config';
 import { Helpers, Project } from 'tnp-helpers';
 import type { TestTemplates } from './spec-templates.backend';

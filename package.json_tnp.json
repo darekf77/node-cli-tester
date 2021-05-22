@@ -6,7 +6,7 @@
   "useFramework": false,
   "type": "isomorphic-lib",
   "required": [
-    "tnp-helpers"
+    "tnp-tools"
   ],
   "version": "v2",
   "overrided": {

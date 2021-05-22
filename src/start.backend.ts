@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { NodeCliTester } from './node-cli-tester.backend';
 
@@ -19,7 +19,7 @@ export async function run<T extends NodeCliTester = NodeCliTester>(
 }
 
 function parseArr(a: string) {
-  if(a === 'null') {
+  if (a === 'null') {
     return null;
   }
   if (a.startsWith('[') && a.endsWith(']')) {
