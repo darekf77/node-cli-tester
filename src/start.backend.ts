@@ -6,7 +6,8 @@ export async function run<T extends NodeCliTester = NodeCliTester>(
   argsv: string[], instance: T = NodeCliTester.Instance() as any
 ) {
 
-  const command: Lowercase<keyof NodeCliTester> = argsv.shift().toLowerCase() as any;
+  // const command: Lowercase<keyof NodeCliTester> = argsv.shift().toLowerCase() as any;
+  const command = argsv.shift().toLowerCase() as any; // TODO up tsc version
   for (const key in instance) {
     if (key.toLowerCase() === command && _.isFunction(instance[key])) {
       const argsToPass = argsv

@@ -6,8 +6,7 @@ import { Helpers } from 'tnp-helpers';
 
 //#region base imports contant
 const baseImports = `
-import * as _ from 'lodash';
-import * as path from 'path';
+import { _, path, crossPlatformPath } from 'tnp-core';
 import chalk from 'chalk';
 import { describe, before, beforeEach, it } from 'mocha';
 import { expect } from 'chai';
@@ -38,7 +37,7 @@ ${''  // testMeta
       }
    const projFolder = '${_.first(projPath.split('/'))}';
    const tmpTestEnvironmentFolder = 'tmp-tests-environments';
-   const cwd = path.resolve(path.join(__dirname, \`../../../../\${tmpTestEnvironmentFolder}\`, cwdHash));
+   const cwd = path.resolve(path.join(crossPlatformPath(__dirname), \`../../../../\${tmpTestEnvironmentFolder}\`, cwdHash));
    const relativePathToFile = {
      ${pathToFiles.map(pathToFile => `${_.camelCase(path.basename(pathToFile))} : \`${pathToFile.split('/').slice(1).join('/')}\``)
         .join(',\n     ')}
