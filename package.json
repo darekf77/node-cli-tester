@@ -7,7 +7,7 @@
     "useFramework": false,
     "type": "isomorphic-lib",
     "required": [
-      "tnp-tools"
+      "tnp-helpers"
     ],
     "version": "v2",
     "overrided": {
@@ -28,12 +28,11 @@
     "isGenerated": false,
     "requiredServers": [],
     "license": "UNLICENSED",
-    "private": true,
     "main": "index.js"
   },
   "name": "node-cli-tester",
   "version": "0.0.3",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "index.js",
   "dependencies": {
     "@angular-devkit/build-angular": "~0.901.3",
@@ -280,5 +279,6 @@
     "node-cli-tester": "bin/node-cli-tester",
     "node-cli-tester-debug": "bin/node-cli-tester-debug"
   },
-  "private": true
+  "private": false,
+  "lastBuildTagHash": "fcfc23ef3afca435f816519acc27f4f479c9c48a"
 }
