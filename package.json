@@ -7,7 +7,7 @@
     "useFramework": false,
     "type": "isomorphic-lib",
     "required": [
-      "tnp-tools"
+      "tnp-helpers"
     ],
     "version": "v2",
     "overrided": {
@@ -28,12 +28,11 @@
     "isGenerated": false,
     "requiredServers": [],
     "license": "UNLICENSED",
-    "private": true,
     "main": "index.js"
   },
   "name": "node-cli-tester",
-  "version": "0.0.2",
-  "license": "UNLICENSED",
+  "version": "0.0.3",
+  "license": "MIT",
   "main": "index.js",
   "dependencies": {
     "@angular-devkit/build-angular": "~0.901.3",
@@ -271,7 +270,6 @@
     "zone.js": "~0.10.2"
   },
   "devDependencies": {},
-  "private": true,
   "husky": {
     "hooks": {
       "pre-push": "tnp deps:show:if:standalone"
@@ -280,5 +278,6 @@
   "bin": {
     "node-cli-tester": "bin/node-cli-tester",
     "node-cli-tester-debug": "bin/node-cli-tester-debug"
-  }
+  },
+  "private": false
 }
