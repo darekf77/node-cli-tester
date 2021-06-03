@@ -5,8 +5,8 @@ export { CliTest } from './cli-test.backend';
 export { run } from './start.backend';
 //#endregion
 
-//#region @notForNpm
+
 export function helloWorld() {
 
-} ``
-//#endregion
+}
+
