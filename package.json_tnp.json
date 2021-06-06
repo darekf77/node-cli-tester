@@ -27,5 +27,6 @@
   "isGenerated": false,
   "requiredServers": [],
   "license": "UNLICENSED",
-  "main": "index.js"
+  "main": "index.js",
+  "private": false
 }
