@@ -1,4 +1,5 @@
 //#region imports
+//#region @backend
 import { path, _ } from 'tnp-core';
 import { Helpers, Project } from 'tnp-helpers';
 import { config } from 'tnp-config';
@@ -6,9 +7,10 @@ import { CliTest } from './cli-test.backend';
 import { CLASS } from 'typescript-class-helpers';
 import { MetaMd } from './meta-content-md.backend';
 //#endregion
+//#endregion
 
 export class NodeCliTester {
-
+  //#region @backend
   //#region singleton
   private static _instances = {};
 
@@ -39,7 +41,11 @@ export class NodeCliTester {
   }
 
   public static InstanceNearestTo(cwd: string) {
+    // @LAST
     const proj = Project.nearestTo(cwd);
+    if (!proj) {
+      Helpers.error(`Nearsest project instance not found for ${cwd} `, false, true);
+    }
     return this.Instance(proj.location);
   }
 
@@ -225,4 +231,5 @@ export class NodeCliTester {
 
   //#endregion
 
+  //#endregion
 }

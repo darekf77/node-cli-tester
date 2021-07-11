@@ -4,7 +4,7 @@ import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { MetaMd } from './meta-content-md.backend';
 import type { TestTemplates } from './spec-templates.backend';
-import type { NodeCliTester } from './node-cli-tester.backend';
+import type { NodeCliTester } from './node-cli-tester';
 import { CLASS } from 'typescript-class-helpers';
 //#endregion
 

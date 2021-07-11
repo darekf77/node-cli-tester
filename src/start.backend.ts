@@ -1,6 +1,6 @@
 import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
-import { NodeCliTester } from './node-cli-tester.backend';
+import { NodeCliTester } from './node-cli-tester';
 
 export async function run<T extends NodeCliTester = NodeCliTester>(
   argsv: string[], instance: T = NodeCliTester.Instance() as any
