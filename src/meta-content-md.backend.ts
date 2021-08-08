@@ -158,7 +158,8 @@ export class MetaMd {
 
   public fileContentByIndex(i: number): string {
     const content = Helpers.readFile(this.filePath) || '';
-    return extract(content, MetaMd.FILE_CONTENT_PART)[i];
+    const extracted =  extract(content, MetaMd.FILE_CONTENT_PART)[i];
+    return extracted;
   }
 
   get basename() {
@@ -273,6 +274,9 @@ ${filesContestString}
 
 //#region extract data parts from content md file
 function extract(content: string, PARTS_TO_FIND: string): string[] {
+  // @LAST something wrong with:
+  // - extracting content by index
+  // - adding extension for ```here
   if (!content) {
     return;
   }
