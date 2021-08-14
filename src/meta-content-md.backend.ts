@@ -273,9 +273,6 @@ ${filesContestString}
 
 //#region extract data parts from content md file
 export function extract(content: string, PARTS_TO_FIND: string): string[] {
-  // @LAST something wrong with:
-  // - extracting content by index
-  // - adding extension for ```here
   if (!content) {
     return;
   }

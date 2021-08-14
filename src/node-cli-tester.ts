@@ -41,7 +41,6 @@ export class NodeCliTester {
   }
 
   public static InstanceNearestTo(cwd: string) {
-    // @LAST
     const proj = Project.nearestTo(cwd);
     if (!proj) {
       Helpers.error(`Nearsest project instance not found for ${cwd} `, false, true);
