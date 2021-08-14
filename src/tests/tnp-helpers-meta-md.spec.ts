@@ -28,13 +28,15 @@ describe('tnp-helpers meta-content.md', () => {
 
   it('Should properly extact file content', () => {
     const ins = MetaMd.instanceFrom(readOnlyFileForTemplate);
-    expect(ins. fileContentByIndex(0)).to.be.eq(tsPart());
+    const tsP = tsPart();
+    const content = ins.fileContentByIndex(0);
+    expect(content).to.be.eq(tsP);
   });
 
 })
 
 async function metaContentFile() {
-  return await MetaMd.create(json5Part() as any, tsPart() as any);
+  return await MetaMd.create(json5Part() as any, [tsPart()] as any);
 }
 
 function json5Part() {
@@ -49,7 +51,8 @@ function json5Part() {
     },
   },
   // path to file
-  "orgFileBasename": "es-common-module.ts",
+  "orgFileBasenames": ["es-common-module.ts"],
+  "orgRelativePathes": ["nes-ui/node_modules/es-common/es-common-module.ts" ],
   "timehash": '24234234',
 }
   `.trim();

@@ -152,7 +152,7 @@ export class NodeCliTester {
     const m = mdContentFileBasename && c.metaMd.all.find(a => a.basename === mdContentFileBasename);
     if (m) {
       const NodeCliTestrClass = CLASS.getFromObject(this);
-      m.addFiles(filePaths, c.testDirnamePath, editorCwd, NodeCliTestrClass.foundProjectsFn, c.cwd);
+      await m.addFiles(filePaths, c.testDirnamePath, editorCwd, NodeCliTestrClass.foundProjectsFn, c.cwd);
     } else {
       await this.addFilesToTest(testNameOrPathToTestFolder, filePaths, editorCwd);
     }

@@ -91,7 +91,7 @@ export class MetaMd {
   }
   //#endregion
 
-  addFiles(
+  async addFiles(
     newFilesPathes: string[],
     destinationFolder: string,
     editorCwd?: string,
@@ -114,7 +114,7 @@ export class MetaMd {
       }
     })
 
-    MetaMd.preserveFiles(
+    await MetaMd.preserveFiles(
       newFilesPathes,
       destinationFolder,
       editorCwd,
@@ -158,7 +158,7 @@ export class MetaMd {
 
   public fileContentByIndex(i: number): string {
     const content = Helpers.readFile(this.filePath) || '';
-    const extracted =  extract(content, MetaMd.FILE_CONTENT_PART)[i];
+    const extracted = extract(content, MetaMd.FILE_CONTENT_PART)[i];
     return extracted;
   }
 
@@ -235,7 +235,6 @@ export class MetaMd {
 async function create(json5string: string, fileContents: string[], testContent?: string) {
   const metadataJSON = Helpers.parse<MetaMdJSON>(json5string, true);
   // Helpers.log(`metadataJSON.orgFileBasename: ${metadataJSON.orgFileBasename}`)
-  const ext = path.extname(_.first(metadataJSON.orgFileBasenames)).replace(/^\./, '');
 
   if (!testContent) {
     const projPath = _.maxBy(_.keys(metadataJSON.projects).map(projRelPath => {
@@ -248,7 +247,8 @@ async function create(json5string: string, fileContents: string[], testContent?:
     testContent = TestTemplatesClass.testPart(metadataJSON.orgRelativePathes, projPath, metadataJSON.timeHash);
   }
 
-  const filesContestString = fileContents.map(fileContent => {
+  const filesContestString = fileContents.map((fileContent, i) => {
+    const ext = path.extname(metadataJSON.orgFileBasenames[i]).replace(/^\./, '');
     return `\`\`\`${ext} ${MetaMd.FILE_CONTENT_PART}
 ${fileContent}
 \`\`\``
@@ -271,9 +271,8 @@ ${filesContestString}
 
 //#endregion
 
-
 //#region extract data parts from content md file
-function extract(content: string, PARTS_TO_FIND: string): string[] {
+export function extract(content: string, PARTS_TO_FIND: string): string[] {
   // @LAST something wrong with:
   // - extracting content by index
   // - adding extension for ```here
@@ -299,10 +298,11 @@ function extract(content: string, PARTS_TO_FIND: string): string[] {
       pushingActive = true;
     }
   }
-  return parts;
+  return parts.filter(f => !!f.trim())
 }
 //#endregion
 
+//#region resolve founded projects
 function resolveFoundedProject(originalAnyTypeFiles: string[], editorCwd: string, foundProjectFn: Function) {
   let foundedProjectsInPath = [];
   for (let index = 0; index < originalAnyTypeFiles.length; index++) {
@@ -318,6 +318,7 @@ function resolveFoundedProject(originalAnyTypeFiles: string[], editorCwd: string
   foundedProjectsInPath = Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location');
   return foundedProjectsInPath;
 }
+//#endregion
 
 //#endregion
 
