@@ -32,8 +32,8 @@
     "private": false
   },
   "name": "node-cli-tester",
-  "version": "0.0.9",
-  "license": "UNLICENSED",
+  "version": "0.0.11",
+  "license": "MIT",
   "main": "index.js",
   "dependencies": {
     "@angular-devkit/build-angular": "0.901.3",
