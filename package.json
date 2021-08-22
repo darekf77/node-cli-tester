@@ -205,7 +205,7 @@
     "ngx-toastr": "11.2.1",
     "ngx-wig": "8.0.0",
     "node-cli-test": "0.0.2",
-    "node-cli-tester": "~0.0.15",
+    "node-cli-tester": "~0.0.16",
     "node-localstorage": "2.1.6",
     "node-notifier": "6.0.0",
     "nodemon": "1.14.11",
@@ -273,6 +273,6 @@
     "node-cli-tester": "bin/node-cli-tester",
     "node-cli-tester-debug": "bin/node-cli-tester-debug"
   },
-  "lastBuildTagHash": "c3ff12d1fdae9124d865cec2986c68ad4d29548b",
+  "lastBuildTagHash": "2bd380c1a29d35619aa90d92e1e05c2299c0305b",
   "private": false
 }
