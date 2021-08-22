@@ -32,8 +32,8 @@
     "private": false
   },
   "name": "node-cli-tester",
-  "version": "0.0.12",
-  "license": "UNLICENSED",
+  "version": "0.0.13",
+  "license": "MIT",
   "main": "index.js",
   "dependencies": {
     "@angular-devkit/build-angular": "0.901.3",
@@ -186,7 +186,7 @@
     "mkdirp": "0.5.1",
     "mocha": "5.2.0",
     "moment": "2.22.2",
-    "morphi": "~4.0.23",
+    "morphi": "~4.0.26",
     "ng-modal-lib": "0.0.6",
     "ng-packagr": "5.7.1",
     "ng-talkback": "~2.4.17",
@@ -235,7 +235,6 @@
     "sloc": "0.2.0",
     "socket.io": "2.4.1",
     "sort-package-json": "1.11.0",
-    "sqlite3": "4.0.9",
     "static-columns": "~1.0.23",
     "string-similarity": "4.0.2",
     "sudo-block": "3.0.0",
