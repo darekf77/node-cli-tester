@@ -5,14 +5,14 @@
   "isCoreProject": false,
   "useFramework": false,
   "type": "isomorphic-lib",
-  "required": [
-    "tnp-helpers"
-  ],
+  "required": [],
   "version": "v2",
   "overrided": {
     "ignoreDepsPattern": [],
     "includeAsDev": [],
-    "includeOnly": [],
+    "includeOnly": [
+      "tnp-helpers"
+    ],
     "dependencies": {
       "typescript": "4.1.3"
     },
