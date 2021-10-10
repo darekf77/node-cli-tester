@@ -33,7 +33,7 @@
   },
   "name": "node-cli-tester",
   "version": "0.0.18",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {
     "tnp-helpers": "~0.0.61"
@@ -205,7 +205,7 @@
     "ngx-toastr": "11.2.1",
     "ngx-wig": "8.0.0",
     "node-cli-test": "0.0.2",
-    "node-cli-tester": "~0.0.18",
+    "node-cli-tester": "~0.0.17",
     "node-localstorage": "2.1.6",
     "node-notifier": "6.0.0",
     "nodemon": "1.14.11",
