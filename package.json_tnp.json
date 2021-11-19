@@ -28,5 +28,6 @@
   "requiredServers": [],
   "license": "UNLICENSED",
   "main": "index.js",
-  "private": false
+  "private": false,
+  "workerPlugins": {}
 }
