@@ -268,5 +268,8 @@
     "node-cli-tester-debug": "bin/node-cli-tester-debug"
   },
   "lastBuildTagHash": "7f494235c2869d3af2f65cd0a20bab7cbdf12212",
-  "private": false
+  "private": false,
+  "recreatedFrom": {
+    "tnp.json": true
+  }
 }
