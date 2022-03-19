@@ -1,7 +1,7 @@
 {
   "name": "node-cli-tester",
   "version": "13.0.5",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {
     "tnp-helpers": "~13.0.13"
@@ -11,5 +11,6 @@
     "node-cli-tester-debug": "bin/node-cli-tester-debug"
   },
   "lastBuildTagHash": "7f494235c2869d3af2f65cd0a20bab7cbdf12212",
-  "private": false
+  "private": false,
+  "devDependencies": {}
 }
