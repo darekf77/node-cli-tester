@@ -2,6 +2,7 @@
   "resources": [
     "README.md"
   ],
+
   "overrided": {
     "ignoreDepsPattern": [],
     "includeAsDev": [],
@@ -13,12 +14,16 @@
     },
     "linkedFolders": []
   },
+
   "linkedProjects": [],
+  'linkedRepos': [],
+
   "libReleaseOptions": {
     "nodts": false,
     "obscure": false,
     "ugly": false
   },
+
   "type": "isomorphic-lib",
   "isCoreProject": false,
   "useFramework": false,
@@ -29,5 +34,5 @@
   "license": "UNLICENSED",
   "main": "index.js",
   "private": false,
-  "workerPlugins": {}
+  "workerPlugins": {},
 }
