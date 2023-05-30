@@ -6,13 +6,17 @@
   "overrided": {
     "ignoreDepsPattern": [],
     "includeAsDev": [],
+
     "includeOnly": [
       "tnp-helpers"
     ],
+
     "dependencies": {
       "typescript": "4.1.3"
     },
-    "linkedFolders": []
+
+    "linkedFolders": [],
+    'npmFixes': [],
   },
 
   "linkedProjects": [],
