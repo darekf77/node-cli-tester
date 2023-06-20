@@ -45,7 +45,7 @@
     "node-cli-tester": "bin/node-cli-tester",
     "node-cli-tester-debug": "bin/node-cli-tester-debug"
   },
-  "lastBuildTagHash": "addd12cac3d294697e3d5d36ef5d6610f2cdf161",
+  "lastBuildTagHash": "b61d8d56fb6c637c3a59d5f93f66df4574245473",
   "private": false,
   "devDependencies": {
     "@angular-devkit/build-angular": "~16.0.5",
@@ -238,7 +238,7 @@
     "ngx-scrolltop": "6.0.0",
     "ngx-store": "3.1.1",
     "ngx-typed-js": "2.1.1",
-    "node-cli-tester": "~13.1.19",
+    "node-cli-tester": "~16.0.2",
     "node-localstorage": "2.1.6",
     "node-notifier": "6.0.0",
     "nodemon": "1.14.11",
