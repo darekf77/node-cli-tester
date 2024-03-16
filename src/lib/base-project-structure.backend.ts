@@ -1,6 +1,6 @@
 //#region imports
 import { _, path } from 'tnp-core';
-import { Helpers, Project } from 'tnp-helpers';
+import { Helpers, BaseProject as Project } from 'tnp-helpers';
 //#endregion
 
 export class BaseProjectStructure {
@@ -31,7 +31,7 @@ export class BaseProjectStructure {
   static generate<P extends Project = Project>(project: P) {
     const that = this;
     const orgCwd = path.join(project.location);
-    const files = project.forEmptyStructure();
+    const files = []; //= project.forEmptyStructure();
     const filesWithoutLinks = files.filter(f => !f.relativeLinkFrom);
     let hash = files.length.toString();
     for (let index = 0; index < filesWithoutLinks.length; index++) {

@@ -2,7 +2,7 @@
 import * as glob from 'glob';
 import { _, path } from 'tnp-core';
 import { config } from 'tnp-config';
-import { Helpers, Project } from 'tnp-helpers';
+import { Helpers, BaseProject as Project } from 'tnp-helpers';
 import type { TestTemplates } from './spec-templates.backend';
 import { CLASS } from 'typescript-class-helpers';
 import { BaseProjectStructure } from './base-project-structure.backend';
@@ -215,8 +215,8 @@ export class MetaMd {
       Helpers.writeFile(fileToWritePath, this.fileContentByIndex(i));
     });
 
-    const proj = ProjectClass.From(path.join(hashDir, this.readonlyMetaJson.firstProjectBasename));
-    const linksToLInk = proj?.forEmptyStructure().filter(f => !!f.relativeLinkFrom) || [];
+    const proj = ProjectClass.ins.From(path.join(hashDir, this.readonlyMetaJson.firstProjectBasename));
+    const linksToLInk = []; // proj?.forEmptyStructure().filter(f => !!f.relativeLinkFrom) || [];
     linksToLInk.forEach(l => {
       const source = path.resolve(path.join(proj.location, l.relativeLinkFrom));
       if (Helpers.exists(source)) {
@@ -306,7 +306,7 @@ function resolveFoundedProject(originalAnyTypeFiles: string[], editorCwd: string
     const fileAbsPath = originalAnyTypeFiles[index];
     foundedProjectsInPath = [
       ...foundedProjectsInPath,
-      ...Project.allProjectFrom(fileAbsPath, editorCwd)
+      ...Project.ins.allProjectFrom(fileAbsPath, editorCwd)
     ];
     if (foundProjectFn) {
       foundedProjectsInPath = foundProjectFn(Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location'));

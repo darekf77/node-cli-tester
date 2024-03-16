@@ -36,7 +36,7 @@
     "workerPlugins": {}
   },
   "name": "node-cli-tester",
-  "version": "16.5.13",
+  "version": "16.5.14",
   "license": "UNLICENSED",
   "dependencies": {
     "tnp-helpers": "~16.5.16"
