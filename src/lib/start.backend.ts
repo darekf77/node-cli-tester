@@ -7,16 +7,17 @@ export async function run<T extends NodeCliTester = NodeCliTester>(
 ) {
 
   // const command: Lowercase<keyof NodeCliTester> = argsv.shift().toLowerCase() as any;
-  const command = argsv.shift().toLowerCase() as any; // TODO up tsc version
-  for (const key in instance) {
-    if (key.toLowerCase() === command && _.isFunction(instance[key])) {
-      const argsToPass = argsv
-        .filter(a => !a.startsWith('--'))
-        .map(a => parseArr(a));
-      await Helpers.runSyncOrAsync([key, instance], ...argsToPass);
-    }
-  }
-  process.exit(0);
+  // TODO
+  // const command = argsv.shift().toLowerCase() as any; // TODO up tsc version
+  // for (const key in instance) {
+  //   if (key.toLowerCase() === command && _.isFunction(instance[key])) {
+  //     const argsToPass: string[] = argsv
+  //       .filter(a => !a.startsWith('--'))
+  //       .map(a => parseArr(a)) as any;
+  //     await Helpers.runSyncOrAsync({ functionFn: [key, instance], arrayOfParams: argsToPass });
+  //   }
+  // }
+  // process.exit(0);
 }
 
 function parseArr(a: string) {
