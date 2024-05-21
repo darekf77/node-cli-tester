@@ -69,8 +69,8 @@ export class CliTest {
 
   //#region getters / pathes
 
-  private get packageJson5Path() {
-    return path.join(this.testDirnamePath, config.file.package_json5);
+  private get firedev_jsonc() {
+    return path.join(this.testDirnamePath, config.file.firedev_jsonc);
   }
 
   private get packageJsonPath() {
@@ -107,8 +107,8 @@ export class CliTest {
       continueWhenExistedFolderDoesntExists: true
     });
 
-    if (Helpers.exists(this.packageJson5Path)) {
-      const testNameFromPJ5 = Helpers.readJson(this.packageJson5Path, {}, true).description;
+    if (Helpers.exists(this.firedev_jsonc)) {
+      const testNameFromPJ5 = Helpers.readJson(this.firedev_jsonc, {}, true).description;
       if (testNameFromPJ5) {
         testName = testNameFromPJ5;
         this.testName = testName;
@@ -141,8 +141,8 @@ export class CliTest {
 
   //#region regenerate package json 5
   private regeneratePackageJson5() {
-    if (!Helpers.exists(this.packageJson5Path)) {
-      Helpers.writeFile(this.packageJson5Path,
+    if (!Helpers.exists(this.firedev_jsonc)) {
+      Helpers.writeFile(this.firedev_jsonc,
         //#region content of package.json5
         `{
   // generated from basename
