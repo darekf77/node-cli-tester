@@ -1,6 +1,6 @@
 //#region imports
-import { _, path } from 'tnp-core';
-import { Helpers, BaseProject as Project } from 'tnp-helpers';
+import { _, path } from 'tnp-core/src';
+import { Helpers, BaseProject as Project } from 'tnp-helpers/src';
 //#endregion
 
 export class BaseProjectStructure {

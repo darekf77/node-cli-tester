@@ -1,10 +1,10 @@
 //#region imports
 //#region @backend
-import { path, _ } from 'tnp-core';
-import { Helpers, BaseProject as Project } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { path, _ } from 'tnp-core/src';
+import { Helpers, BaseProject as Project } from 'tnp-helpers/src';
+import { config } from 'tnp-config/src';
 import { CliTest } from './cli-test.backend';
-import { CLASS } from 'typescript-class-helpers';
+import { CLASS } from 'typescript-class-helpers/src';
 import { MetaMd } from './meta-content-md.backend';
 //#endregion
 //#endregion

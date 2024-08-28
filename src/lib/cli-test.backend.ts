@@ -1,11 +1,11 @@
 //#region imports
-import { _, path } from 'tnp-core';
-import { config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
+import { _, path } from 'tnp-core/src';
+import { config } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
 import { MetaMd } from './meta-content-md.backend';
 import type { TestTemplates } from './spec-templates.backend';
 import type { NodeCliTester } from './node-cli-tester';
-import { CLASS } from 'typescript-class-helpers';
+import { CLASS } from 'typescript-class-helpers/src';
 //#endregion
 
 export class CliTest {

@@ -1,10 +1,10 @@
 //#region imports
 import * as glob from 'glob';
-import { _, path } from 'tnp-core';
-import { config } from 'tnp-config';
-import { Helpers, BaseProject as Project } from 'tnp-helpers';
+import { _, path } from 'tnp-core/src';
+import { config } from 'tnp-config/src';
+import { Helpers, BaseProject as Project } from 'tnp-helpers/src';
 import type { TestTemplates } from './spec-templates.backend';
-import { CLASS } from 'typescript-class-helpers';
+import { CLASS } from 'typescript-class-helpers/src';
 import { BaseProjectStructure } from './base-project-structure.backend';
 //#endregion
 

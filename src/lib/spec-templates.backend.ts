@@ -1,7 +1,7 @@
 //#region imports
-import { path, _ } from 'tnp-core';
-import { CLASS } from 'typescript-class-helpers';
-import { Helpers } from 'tnp-helpers';
+import { path, _ } from 'tnp-core/src';
+import { CLASS } from 'typescript-class-helpers/src';
+import { Helpers } from 'tnp-helpers/src';
 //#endregion
 
 //#region base imports contant
