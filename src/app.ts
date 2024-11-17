@@ -32,3 +32,19 @@
 //#endregion
 
 //#endregion
+
+
+//#region  node-cli-tester component 
+//#region @browser
+@Component({ template: 'hello world fromr node-cli-tester' })
+export class NodeCliTesterComponent {}
+//#endregion
+//#endregion
+
+
+//#region  node-cli-tester module 
+//#region @browser
+@NgModule({ declarations: [NodeCliTesterComponent], imports: [CommonModule], exports: [NodeCliTesterComponent] })
+export class NodeCliTesterModule {}
+//#endregion
+//#endregion
