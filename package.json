@@ -36,7 +36,8 @@
     "license": "UNLICENSED",
     "main": "index.js",
     "private": false,
-    "workerPlugins": {}
+    "workerPlugins": {},
+    "packageJsonOverride": {}
   },
   "name": "node-cli-tester",
   "version": "18.0.19",

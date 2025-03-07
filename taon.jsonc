@@ -35,5 +35,6 @@
   "license": "UNLICENSED",
   "main": "index.js",
   "private": false,
-  "workerPlugins": {}
+  "workerPlugins": {},
+  "packageJsonOverride": {}
 }
