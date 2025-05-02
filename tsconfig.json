@@ -4,10 +4,16 @@
     "strictNullChecks": false,
     "rootDir": "./src",
     "paths": {
-      "node-cli-tester": [
+      "@lib": [
         "./src/lib"
       ],
-      "node-cli-tester/*": [
+      "@lib/*": [
+        "./src/lib/*"
+      ],
+      "node-cli-tester/src": [
+        "./src/lib"
+      ],
+      "node-cli-tester/src/*": [
         "./src/lib/*"
       ]
     }
