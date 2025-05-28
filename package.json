@@ -1,6 +1,6 @@
 {
   "name": "node-cli-tester",
-  "version": "19.0.20",
+  "version": "19.0.21",
   "scripts": {
     "taon init": "taon init",
     "taon start": "taon start",
@@ -350,10 +350,5 @@
   "bin": {
     "node-cli-tester": "bin/node-cli-tester",
     "node-cli-tester-debug": "bin/node-cli-tester-debug"
-  },
-  "exports": {
-    ".": {
-      "style": "./scss/index.scss"
-    }
   }
 }
