@@ -2,6 +2,7 @@
   "type": "isomorphic-lib",
   "version": "v19",
   "dependenciesNamesForNpmLib": ["tnp-helpers"],
+  "appId": "com.domain.example.node-cli-tester",
 
   "autoReleaseConfigAllowedItems": [{
     "artifactName": "npm-lib-and-cli-tool"
@@ -14,7 +15,7 @@
     "author": "Dariusz Filipiak",
     "license": "UNLICENSED",
     "private": false,
-
-    "scripts": {}
+    "scripts": {},
+    "description": "Description for node-cli-tester. Hello world!"
   }
 }
