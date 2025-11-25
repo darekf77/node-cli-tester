@@ -5,7 +5,7 @@ import { Helpers } from 'tnp-helpers';
 import { MetaMd } from '../meta-content-md.backend';
 // import type { MetaMdJSON } from '../meta-content-md.backend';
 import { TestTemplates } from '../spec-templates.backend';
-import { config } from 'tnp-config';
+import { config } from 'tnp-core';
 TestTemplates.testPart; // TODO QUICK FIX for CLASS.getBy in test
 
 // const instance = BrowserDB.instance;

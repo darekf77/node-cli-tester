@@ -12,7 +12,7 @@ import { describe, before, beforeEach, it } from 'mocha';
 import { expect } from 'chai';
 import { CLASS } from 'typescript-class-helpers';
 import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { config } from 'tnp-core';
 import { NodeCliTester  } from 'node-cli-tester';
 `.trim();
 
