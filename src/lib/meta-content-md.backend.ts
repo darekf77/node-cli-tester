@@ -1,7 +1,7 @@
 //#region imports
 import * as glob from 'glob';
 import { _, path } from 'tnp-core/src';
-import { config } from 'tnp-config/src';
+import { config } from 'tnp-core/src';
 import { Helpers, BaseProject as Project } from 'tnp-helpers/src';
 import type { TestTemplates } from './spec-templates.backend';
 import { CLASS } from 'typescript-class-helpers/src';
