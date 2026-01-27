@@ -1,7 +1,7 @@
 //#region imports
 //#region @backend
 import { path, _ } from 'tnp-core/src';
-import { Helpers, BaseProject as Project } from 'tnp-helpers/src';
+import { Helpers, HelpersTaon, BaseProject as Project } from 'tnp-helpers/src';
 import { config } from 'tnp-core/src';
 import { CliTest } from './cli-test.backend';
 import { CLASS } from 'typescript-class-helpers/src';
@@ -57,7 +57,7 @@ export class NodeCliTester {
     const names = CliTest.allFrom(this.cwd).map(c => {
       return { label: c.testName, option: c.testDirnamePath };
     });
-    Helpers.outputToVScode(names);
+    HelpersTaon.outputToVScode(names);
   }
   //#endregion
 
@@ -71,7 +71,7 @@ export class NodeCliTester {
         return { option: v, label: `add to "${path.basename(v)}"` }
       })
     ];
-    Helpers.outputToVScode(toOutput);
+    HelpersTaon.outputToVScode(toOutput);
   }
   //#endregion
 
@@ -83,7 +83,7 @@ export class NodeCliTester {
         return { option: c.readonlyMetaJson.timeHash, label: `add to "${path.basename(c.filePath)}"` }
       })
     ];
-    Helpers.outputToVScode(toOutput);
+    HelpersTaon.outputToVScode(toOutput);
   }
   //#endregion
 
@@ -100,7 +100,7 @@ export class NodeCliTester {
         return { label: c.testName, option: c.testDirnamePath };
       }),
     ];
-    Helpers.outputToVScode(names);
+    HelpersTaon.outputToVScode(names);
   }
   //#endregion
 

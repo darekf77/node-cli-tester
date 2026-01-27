@@ -1,6 +1,6 @@
 //#region imports
 import { _, path } from 'tnp-core/src';
-import { Helpers, BaseProject as Project } from 'tnp-helpers/src';
+import { HelpersTaon, Helpers, BaseProject as Project } from 'tnp-helpers/src';
 //#endregion
 
 export class BaseProjectStructure {
@@ -10,22 +10,23 @@ export class BaseProjectStructure {
   }
 
   get projectPathBasename() {
-    return _.first(path.basename(this.cwd).split('__'))
+    return _.first(path.basename(this.cwd).split('__'));
   }
 
-  constructor(
-    private cwd: string
-  ) {
-
-  }
+  constructor(private cwd: string) {}
 
   copyto(destinationCwd: string, basename?: string) {
-    Helpers.copy(this.cwd, path.join(destinationCwd, basename ? basename : this.projectPathBasename));
+    HelpersTaon.copy(
+      this.cwd,
+      path.join(destinationCwd, basename ? basename : this.projectPathBasename),
+    );
   }
 
   static allBaseStructures(cwd) {
     const folderPath = path.join(cwd, this.BASE_STRUCTURES_FOLDER);
-    return Helpers.foldersFrom(folderPath).map(f => new BaseProjectStructure(f));
+    return Helpers.foldersFrom(folderPath).map(
+      f => new BaseProjectStructure(f),
+    );
   }
 
   static generate<P extends Project = Project>(project: P) {
@@ -37,13 +38,20 @@ export class BaseProjectStructure {
     for (let index = 0; index < filesWithoutLinks.length; index++) {
       const file = filesWithoutLinks[index];
       const abasolutePAth = path.join(orgCwd, file.relativePath);
-      hash += (file.relativePath.length + 1).toString() +
-        (Helpers.isFolder(abasolutePAth) ? '' : (Helpers.readFile(abasolutePAth)?.length + 1).toString());
+      hash +=
+        (file.relativePath.length + 1).toString() +
+        (Helpers.isFolder(abasolutePAth)
+          ? ''
+          : (Helpers.readFile(abasolutePAth)?.length + 1).toString());
     }
-    hash = `${project.name}__${Helpers.checksum(hash)}`;
+    hash = `${project.name}__${HelpersTaon.checksum(hash)}`;
     return {
       insideIfNotExists(destinationCwd: string) {
-        const destStruct = path.join(destinationCwd, that.BASE_STRUCTURES_FOLDER, hash);
+        const destStruct = path.join(
+          destinationCwd,
+          that.BASE_STRUCTURES_FOLDER,
+          hash,
+        );
         if (Helpers.exists(destStruct)) {
           Helpers.log(`Base structure with name: ${hash}`);
           return hash;
@@ -56,21 +64,20 @@ export class BaseProjectStructure {
           Helpers.mkdirp(path.dirname(destPath));
           if (Helpers.isFolder(orgPath)) {
             if (file.includeContent) {
-              Helpers.copy(orgPath, destPath)
+              HelpersTaon.copy(orgPath, destPath);
             } else {
               Helpers.mkdirp(destPath);
             }
           } else {
             if (file.includeContent) {
-              Helpers.copyFile(orgPath, destPath);
+              HelpersTaon.copyFile(orgPath, destPath);
             } else {
               Helpers.writeFile(destPath, '');
             }
           }
         }
         return hash;
-      }
-    }
+      },
+    };
   }
-
 }

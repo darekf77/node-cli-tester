@@ -1,6 +1,6 @@
 //#region imports
 import * as glob from 'glob';
-import { _, path } from 'tnp-core/src';
+import { _, path, Utils } from 'tnp-core/src';
 import { config } from 'tnp-core/src';
 import { Helpers, BaseProject as Project } from 'tnp-helpers/src';
 import type { TestTemplates } from './spec-templates.backend';
@@ -101,7 +101,7 @@ export class MetaMd {
     let foundedProjectsInPath = resolveFoundedProject(newFilesPathes, editorCwd, foundProjectFn);
     const mostBaseLocationFound = _.minBy(foundedProjectsInPath, p => p.location.length).location;
 
-    newFilesPathes = Helpers.arrays.uniqArray([
+    newFilesPathes = Utils.uniqArray([
       ...newFilesPathes,
       ...this.readonlyMetaJson.orgRelativePathes.map(a => {
         return path.join(path.dirname(mostBaseLocationFound), a)
@@ -309,10 +309,10 @@ function resolveFoundedProject(originalAnyTypeFiles: string[], editorCwd: string
       ...Project.ins.allProjectFrom(fileAbsPath, editorCwd)
     ];
     if (foundProjectFn) {
-      foundedProjectsInPath = foundProjectFn(Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location'));
+      foundedProjectsInPath = foundProjectFn(Utils.uniqArray<Project>(foundedProjectsInPath, 'location'));
     }
   }
-  foundedProjectsInPath = Helpers.arrays.uniqArray<Project>(foundedProjectsInPath, 'location');
+  foundedProjectsInPath = Utils.uniqArray<Project>(foundedProjectsInPath, 'location');
   return foundedProjectsInPath;
 }
 //#endregion
