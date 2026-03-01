@@ -133,7 +133,7 @@ export class NodeCliTester {
   public async addFilesToTest(testNameOrPathToTestFolder: string, filePath: string[], editorCwd: string = process.cwd()) {
     const c = CliTest.from(this.cwd, path.isAbsolute(testNameOrPathToTestFolder)
       ? path.basename(testNameOrPathToTestFolder) : testNameOrPathToTestFolder);
-    await c.metaMd.add(filePath, editorCwd, CLASS.getFromObject(this));
+    await c.metaMd.add(filePath, editorCwd, CLASS.getFromObject(this) as any);
   }
   //#endregion
 
@@ -150,7 +150,7 @@ export class NodeCliTester {
       ? path.basename(mdContentFileBasenameOrPath) : mdContentFileBasenameOrPath);
     const m = mdContentFileBasename && c.metaMd.all.find(a => a.basename === mdContentFileBasename);
     if (m) {
-      const NodeCliTestrClass = CLASS.getFromObject(this);
+      const NodeCliTestrClass = CLASS.getFromObject(this) as any;
       await m.addFiles(filePaths, c.testDirnamePath, editorCwd, NodeCliTestrClass.foundProjectsFn, c.cwd);
     } else {
       await this.addFilesToTest(testNameOrPathToTestFolder, filePaths, editorCwd);
@@ -182,7 +182,7 @@ export class NodeCliTester {
         return false;
       }));
       if (machingMdFile) {
-        const NodeCliTesterClass = (CLASS.getFromObject(this) as typeof NodeCliTester);
+        const NodeCliTesterClass = (CLASS.getFromObject(this) as any as typeof NodeCliTester);
         const res = {
           label: ` < regenerate last hash env "${machingMdFile.readonlyMetaJson.timeHash}" `
             + `for project: "${machingMdFile.readonlyMetaJson.firstProjectBasename}" in `
@@ -201,7 +201,7 @@ export class NodeCliTester {
     await this.regenerateEnvironment(timeHash);
   }
   public async regenerateLast() {
-    const NodeCliTesterClass = (CLASS.getFromObject(this) as typeof NodeCliTester);
+    const NodeCliTesterClass = (CLASS.getFromObject(this) as any as typeof NodeCliTester);
     await this.regenerateEnvironment(NodeCliTesterClass.ACTIONS.REGENERATE_LAST_HASH);
   }
 
@@ -209,7 +209,7 @@ export class NodeCliTester {
 
   //#region regenerate / regenerate environment function
   public async regenerateEnvironment(timeHash: string, tempFolder = config.folder.tmpTestsEnvironments, onlyIfNotExists = false) {
-    const NodeCliTesterClass = (CLASS.getFromObject(this) as typeof NodeCliTester);
+    const NodeCliTesterClass = (CLASS.getFromObject(this) as any as typeof NodeCliTester);
     if (timeHash === NodeCliTesterClass.ACTIONS.REGENERATE_LAST_HASH) {
       timeHash = Helpers.readFile(this.lastRegenerateHashFile, '');
     }
