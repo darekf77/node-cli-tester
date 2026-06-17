@@ -1,6 +1,6 @@
 {
   "name": "node-cli-tester",
-  "version": "21.0.35",
+  "version": "21.0.36",
   "scripts": {
     "taon init": "taon init",
     "taon start": "taon start",
@@ -458,6 +458,7 @@
   },
   "bin": {
     "node-cli-tester": "bin/node-cli-tester",
-    "node-cli-tester-debug": "bin/node-cli-tester-debug"
+    "node-cli-tester-debug": "bin/node-cli-tester-debug",
+    "node-cli-tester-debug-brk": "bin/node-cli-tester-debug-brk"
   }
 }
